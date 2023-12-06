@@ -1,20 +1,34 @@
 import { IUserRepository } from "@/modules/users/domains/repositories/IUserRepository";
 import { IUserService } from "./IUserService";
+import Cookie from "js-cookie";
+import type {
+  UserLogin,
+  UserRegister,
+  UserUpdate,
+  UserCurrent,
+} from "@/modules/users/domains/models/User";
 
 function UserService(UserRepository: IUserRepository): IUserService {
   return {
-    async createUser(user) {
-      const userData = await UserRepository.create(user);
+    login: async (body: UserLogin): Promise<UserCurrent | null> => {
+      const userData = await UserRepository.findByEmailAndPassword(body);
       return userData;
     },
-    async getUserById(id: number) {
-      const userData = await UserRepository.find(id);
+    getUser: async (): Promise<UserCurrent | null> => {
+      const token = Cookie.get("access_token");
+      if (token) {
+        const userData = await UserRepository.findByToken(token);
+        return userData;
+      }
+      return null;
+    },
+    register: async (body: UserRegister): Promise<UserCurrent | null> => {
+      const userData = await UserRepository.create(body);
       return userData;
     },
-
-    async getAllUser() {
-      const usersList = await UserRepository.all();
-      return usersList;
+    update: async (body: UserUpdate): Promise<UserCurrent | null> => {
+      const userData = await UserRepository.update(body);
+      return userData;
     },
   };
 }

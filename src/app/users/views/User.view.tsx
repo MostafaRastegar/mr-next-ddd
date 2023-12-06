@@ -12,7 +12,13 @@ export default function UsersView() {
   return (
     <>
       <p>{count}</p>
-      {
+      <p>email:{data?.email}</p>
+      <p>userName:{data?.username}</p>
+      <p>bio:{data?.bio}</p>
+      <p>image:{data?.image}</p>
+      <p>token:{data?.token}</p>
+
+      {/* {
         <div
           style={{
             display: "grid",
@@ -34,7 +40,7 @@ export default function UsersView() {
             </div>
           ))}
         </div>
-      }
+      } */}
     </>
   );
 }

@@ -1,7 +1,13 @@
-import { User } from "../models/User";
+import {
+  UserLogin,
+  UserRegister,
+  UserUpdate,
+  UserCurrent,
+} from "../models/User";
 
 export interface IUserRepository {
-  all(): Promise<User[]>;
-  find(id: number): Promise<User>;
-  create(data: object): Promise<User>;
+  update(body: UserUpdate): Promise<UserCurrent>;
+  findByToken(token?: string): Promise<UserCurrent>;
+  findByEmailAndPassword(body: UserLogin): Promise<UserCurrent>;
+  create(body: UserRegister): Promise<UserCurrent>;
 }

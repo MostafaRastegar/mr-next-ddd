@@ -1,7 +1,13 @@
-import type { User } from "@/modules/users/domains/models/User";
+import type {
+  UserLogin,
+  UserRegister,
+  UserUpdate,
+  UserCurrent,
+} from "@/modules/users/domains/models/User";
 
 export interface IUserService {
-  createUser(userData: User): Promise<User>;
-  getAllUser(): Promise<User[] | null>;
-  getUserById(userId: number): Promise<User | null>;
+  register(body: UserRegister): Promise<UserCurrent | null>;
+  login(body: UserLogin): Promise<UserCurrent | null>;
+  update(body: UserUpdate): Promise<UserUpdate | null>;
+  getUser(): Promise<UserCurrent | null>;
 }
