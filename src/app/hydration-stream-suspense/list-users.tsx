@@ -15,7 +15,6 @@ export default function ListUsers() {
   const { data } = useQuery<User[]>({
     queryKey: ["stream-hydrate-users"],
     queryFn: () => getUsers(),
-    suspense: true,
     staleTime: 5 * 1000,
   });
 

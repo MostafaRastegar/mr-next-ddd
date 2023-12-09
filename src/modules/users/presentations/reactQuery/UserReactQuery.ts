@@ -4,7 +4,8 @@ import UserService from "@/modules/users/applications/services/UserService";
 import { UserRepository } from "@/modules/users/infrastructure";
 
 import { User } from "@/modules/users/domains/models/User";
-const userService = UserService(UserRepository);
+import cookies from "js-cookie";
+const userService = UserService(UserRepository, () => cookies);
 const userController = UserController(userService);
 
 function UserUseCase() {

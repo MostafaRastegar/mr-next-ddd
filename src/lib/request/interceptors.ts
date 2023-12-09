@@ -9,9 +9,13 @@ import Cookies from "js-cookie";
 const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const accessToken = Cookies.get("accessToken");
   if (accessToken && accessToken !== "null") {
-    config.headers["Authorization"] = `GityToken ${accessToken}`;
+    if (config && config.headers) {
+      config.headers["Authorization"] = `Token ${accessToken}`;
+    }
   } else {
-    delete config.headers["Authorization"];
+    if (config && config.headers) {
+      delete config.headers["Authorization"];
+    }
   }
 
   return config;

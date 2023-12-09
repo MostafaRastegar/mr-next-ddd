@@ -1,32 +1,66 @@
 import { IUserRepository } from "@/modules/users/domains/repositories/IUserRepository";
 import { IUserService } from "./IUserService";
-import Cookie from "js-cookie";
+import JsCookies from "js-cookie";
 import type {
   UserLogin,
   UserRegister,
   UserUpdate,
   UserCurrent,
+  UserLoginUserParams,
+  UserRegisterUserParams,
+  UserUpdateUserParams,
 } from "@/modules/users/domains/models/User";
 
-function UserService(UserRepository: IUserRepository): IUserService {
+const cookiesClient = () => JsCookies;
+function UserService(
+  UserRepository: IUserRepository,
+  cookies: Function = cookiesClient,
+  redirect?: Function
+): IUserService {
   return {
-    login: async (body: UserLogin): Promise<UserCurrent | null> => {
-      const userData = await UserRepository.findByEmailAndPassword(body);
-      return userData;
-    },
     getUser: async (): Promise<UserCurrent | null> => {
-      const token = Cookie.get("access_token");
+      const token = (await cookies().get("access_token")) as string;
       if (token) {
         const userData = await UserRepository.findByToken(token);
         return userData;
       }
       return null;
     },
-    register: async (body: UserRegister): Promise<UserCurrent | null> => {
-      const userData = await UserRepository.create(body);
-      return userData;
+    login: async (body: UserLoginUserParams): Promise<void> => {
+      let success = false;
+      try {
+        const userData = await UserRepository.findByEmailAndPassword(body);
+        if (cookies) {
+          await cookies().set("access_token", userData.user.token);
+        }
+
+        if (userData.user.token) {
+          success = true;
+        }
+      } finally {
+        if (success && redirect) {
+          redirect("users");
+        }
+      }
     },
-    update: async (body: UserUpdate): Promise<UserCurrent | null> => {
+    register: async (body: UserRegisterUserParams): Promise<void> => {
+      let success = false;
+      try {
+        const userData = await UserRepository.create(body);
+        if (cookies) {
+          await cookies().set("access_token", userData.user.token);
+        }
+
+        if (userData.user.token) {
+          success = true;
+        }
+      } finally {
+        if (success && redirect) {
+          redirect("users");
+        }
+      }
+    },
+    update: async (body: UserUpdateUserParams): Promise<UserUpdate | null> => {
       const userData = await UserRepository.update(body);
       return userData;
     },

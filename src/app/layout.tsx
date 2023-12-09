@@ -1,6 +1,6 @@
 import Providers from "@/utils/provider";
 import React from "react";
-// import "./globals.css";
+import "./globals.css";
 
 export const metadata = {
   title: "Create Next App",
