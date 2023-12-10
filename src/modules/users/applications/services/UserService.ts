@@ -2,67 +2,82 @@ import { IUserRepository } from "@/modules/users/domains/repositories/IUserRepos
 import { IUserService } from "./IUserService";
 import JsCookies from "js-cookie";
 import type {
-  UserLogin,
-  UserRegister,
   UserUpdate,
   UserCurrent,
   UserLoginUserParams,
   UserRegisterUserParams,
   UserUpdateUserParams,
 } from "@/modules/users/domains/models/User";
+import { AxiosError } from "axios";
 
 const cookiesClient = () => JsCookies;
 function UserService(
   UserRepository: IUserRepository,
-  cookies: Function = cookiesClient,
-  redirect?: Function
+  redirect?: Function,
+  cookies: Function = cookiesClient
 ): IUserService {
   return {
-    getUser: async (): Promise<UserCurrent | null> => {
-      const token = (await cookies().get("access_token")) as string;
-      if (token) {
-        const userData = await UserRepository.findByToken(token);
+    getUser: async (): Promise<UserCurrent | AxiosError> => {
+      try {
+        const userData = await UserRepository.findByToken();
         return userData;
+      } catch (e) {
+        const error = e as AxiosError;
+        return error;
       }
-      return null;
     },
-    login: async (body: UserLoginUserParams): Promise<void> => {
+
+    login: async (
+      body: UserLoginUserParams
+    ): Promise<UserCurrent | AxiosError> => {
       let success = false;
       try {
         const userData = await UserRepository.findByEmailAndPassword(body);
-        if (cookies) {
-          await cookies().set("access_token", userData.user.token);
+        const token = userData?.user?.token;
+        if (token && redirect && cookies) {
+          await cookies().set("access_token", token);
         }
-
-        if (userData.user.token) {
-          success = true;
-        }
+        return userData;
+      } catch (e) {
+        const error = e as AxiosError;
+        return error;
       } finally {
         if (success && redirect) {
-          redirect("users");
+          redirect("/users");
         }
       }
     },
-    register: async (body: UserRegisterUserParams): Promise<void> => {
+
+    register: async (
+      body: UserRegisterUserParams
+    ): Promise<UserCurrent | AxiosError> => {
       let success = false;
       try {
         const userData = await UserRepository.create(body);
-        if (cookies) {
+        if (cookies && userData?.user?.token) {
           await cookies().set("access_token", userData.user.token);
-        }
-
-        if (userData.user.token) {
           success = true;
         }
+        return userData;
+      } catch (e) {
+        const error = e as AxiosError;
+        return error;
       } finally {
         if (success && redirect) {
-          redirect("users");
+          redirect("/users");
         }
       }
     },
-    update: async (body: UserUpdateUserParams): Promise<UserUpdate | null> => {
-      const userData = await UserRepository.update(body);
-      return userData;
+    update: async (
+      body: UserUpdateUserParams
+    ): Promise<UserUpdate | AxiosError> => {
+      try {
+        const userData = await UserRepository.update(body);
+        return userData;
+      } catch (e) {
+        const error = e as AxiosError;
+        return error;
+      }
     },
   };
 }

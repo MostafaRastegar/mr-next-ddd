@@ -5,9 +5,10 @@ import {
   AxiosResponse,
 } from "axios";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
-  const accessToken = Cookies.get("accessToken");
+  const accessToken = Cookies.get("access_token");
   if (accessToken && accessToken !== "null") {
     if (config && config.headers) {
       config.headers["Authorization"] = `Token ${accessToken}`;
@@ -37,7 +38,7 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
   return response;
 };
 
-const onResponseError = async (error: AxiosError) => {
+const onResponseError = async (error: AxiosError): Promise<AxiosError> => {
   // if (error?.response?.data?.error)
   // alert("Error!: " + error?.response?.data?.error);
 
@@ -48,13 +49,18 @@ const onResponseError = async (error: AxiosError) => {
   // // @ts-ignore
   // exceptionHandlers[exceptionHandlersMethod(error.response.status)]();
 
-  if (error?.response?.status === 401) {
-    // return logoutCleanUp();
-    return false;
-  }
+  // if (error?.response?.status === 401) {
+  //   // return logoutCleanUp();
+  //   return false;
+  // }
+  // const errorData = error?.response?.data;
+  // const errorMessage = errorData?.message;
+  // if (errorMessage) {
+  //   toast.error(errorMessage);
+  // }
+  // console.log(" Promise.reject :>> ", Object.keys(error));
 
-  return error;
-  // return Promise.reject(error?.response?.data);
+  return Promise.reject(error.response);
 };
 
 // const retryRequest = (axiosInstance: AxiosInstance) => {

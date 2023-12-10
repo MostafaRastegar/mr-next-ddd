@@ -1,6 +1,8 @@
+import { Toaster } from 'react-hot-toast';
 import Providers from "@/utils/provider";
 import React from "react";
 import "./globals.css";
+
 
 export const metadata = {
   title: "Create Next App",
@@ -15,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Toaster />
+          {children}
+        </Providers>
       </body>
     </html>
   );

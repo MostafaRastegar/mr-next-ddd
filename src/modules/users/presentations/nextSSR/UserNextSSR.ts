@@ -5,10 +5,12 @@ import {
   UserLoginParams,
   UserRegisterParams,
 } from "@/modules/users/domains/models/User";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-
-const userService = UserService(UserRepository, cookies, redirect);
+// import { cookies } from "next/headers";
+// import { redirect } from "next/navigation";
+import Router from "next/router";
+const userService = UserService(UserRepository, (path: string) =>
+  Router.push(path)
+);
 const userController = UserController(userService);
 
 function UserNextSSR() {

@@ -1,16 +1,28 @@
 
+"use client"
 import { UserLoginParams } from "@/modules/users/domains/models/User"
-import UserNextSSR from "@/modules/users/presentations/nextSSR/UserNextSSR"
+import UserReactQuery from "@/modules/users/presentations/reactQuery/UserReactQuery"
+import { useRef, FormEventHandler, FormEvent, ButtonHTMLAttributes } from "react"
 
 
 
-const { userRegister } = UserNextSSR();
-async function formAction(formData: FormData) {
-  "use server"
-  return userRegister(formData)
-}
+const { useUserRegister } = UserReactQuery();
+// async function formAction(formData: FormData) {
+//   "use server"
+//   return userRegister(formData)
+// }
 
 const Login = () => {
+  const formRef = useRef(null)
+  const { mutate, isPending, error, isError } = useUserRegister()
+  const onsubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (formRef.current) {
+      const formData = new FormData(formRef.current)
+      return mutate(formData)
+    }
+  }
+
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -19,7 +31,7 @@ const Login = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action={formAction}>
+        <form className="space-y-6" onSubmit={onsubmit} ref={formRef}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label>
             <div className="mt-2">
@@ -47,9 +59,10 @@ const Login = () => {
 
           <div>
             <button
+              disabled={isPending}
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >Sign in</button>
+            >{isPending ? 'pending ...' : 'Sign in'}</button>
           </div>
         </form>
 

@@ -1,3 +1,4 @@
+"use client"
 
 import { UserLoginParams } from "@/modules/users/domains/models/User"
 import UserNextSSR from "@/modules/users/presentations/nextSSR/UserNextSSR"
@@ -6,10 +7,6 @@ import Link from "next/link";
 
 
 const { userLogin } = UserNextSSR();
-async function formAction(formData: FormData) {
-  "use server"
-  return userLogin(formData)
-}
 
 const Login = () => {
   return (
@@ -20,7 +17,7 @@ const Login = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action={formAction}>
+        <form className="space-y-6" >
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label>
             <div className="mt-2">
