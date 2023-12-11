@@ -5,7 +5,6 @@ import {
   AxiosResponse,
 } from "axios";
 import Cookies from "js-cookie";
-import toast from "react-hot-toast";
 
 const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const accessToken = Cookies.get("access_token");
@@ -23,7 +22,7 @@ const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
 };
 
 const onRequestError = (error: AxiosError) => {
-  return error;
+  return Promise.reject({ ...error.response, status: error.code });
 };
 
 // const generateResponse = (response: AxiosResponse) => {

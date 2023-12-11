@@ -7,7 +7,6 @@ import type {
   UserLoginUserParams,
   UserUpdateUserParams,
 } from "@/modules/users/domains/models/User";
-import toast from "react-hot-toast";
 function UserController(UserService: IUserService) {
   return {
     async getCurrentUser() {
@@ -18,13 +17,8 @@ function UserController(UserService: IUserService) {
       const requestBody: UserRegisterUserParams = {
         user: params,
       };
-      try {
-        const userData = await UserService.register(requestBody);
-        return userData;
-      } catch (error) {
-        console.log("userRegister :>> ", error);
-        return error;
-      }
+      const userData = await UserService.register(requestBody);
+      return userData;
     },
 
     async userLogin(params: UserLoginParams) {

@@ -5,12 +5,10 @@ import {
   UserLoginParams,
   UserRegisterParams,
 } from "@/modules/users/domains/models/User";
-// import { cookies } from "next/headers";
-// import { redirect } from "next/navigation";
-import Router from "next/router";
-const userService = UserService(UserRepository, (path: string) =>
-  Router.push(path)
-);
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+const userService = UserService(UserRepository, redirect, cookies);
 const userController = UserController(userService);
 
 function UserNextSSR() {
@@ -21,7 +19,6 @@ function UserNextSSR() {
         password: formData.get("password") as string,
       };
       const result = await userController.userLogin(rawFormData);
-
       return result;
     },
     userRegister: async (formData: FormData) => {

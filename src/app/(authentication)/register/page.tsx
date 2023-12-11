@@ -1,8 +1,7 @@
 
 "use client"
-import { UserLoginParams } from "@/modules/users/domains/models/User"
 import UserReactQuery from "@/modules/users/presentations/reactQuery/UserReactQuery"
-import { useRef, FormEventHandler, FormEvent, ButtonHTMLAttributes } from "react"
+import { useRef, FormEvent } from "react"
 
 
 
@@ -14,7 +13,7 @@ const { useUserRegister } = UserReactQuery();
 
 const Login = () => {
   const formRef = useRef(null)
-  const { mutate, isPending, error, isError } = useUserRegister()
+  const { mutate, isPending, error } = useUserRegister();
   const onsubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formRef.current) {

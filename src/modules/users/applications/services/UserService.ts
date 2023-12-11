@@ -18,66 +18,39 @@ function UserService(
 ): IUserService {
   return {
     getUser: async (): Promise<UserCurrent | AxiosError> => {
-      try {
-        const userData = await UserRepository.findByToken();
-        return userData;
-      } catch (e) {
-        const error = e as AxiosError;
-        return error;
-      }
+      const userData = await UserRepository.findByToken();
+      return userData;
     },
 
     login: async (
       body: UserLoginUserParams
     ): Promise<UserCurrent | AxiosError> => {
-      let success = false;
-      try {
-        const userData = await UserRepository.findByEmailAndPassword(body);
-        const token = userData?.user?.token;
-        if (token && redirect && cookies) {
-          await cookies().set("access_token", token);
-        }
-        return userData;
-      } catch (e) {
-        const error = e as AxiosError;
-        return error;
-      } finally {
-        if (success && redirect) {
-          redirect("/users");
-        }
+      const userData = await UserRepository.findByEmailAndPassword(body);
+      const token = userData?.user?.token;
+      if (token && redirect && cookies) {
+        await cookies().set("access_token", token);
+        redirect("/users");
       }
+      return userData;
     },
 
     register: async (
       body: UserRegisterUserParams
     ): Promise<UserCurrent | AxiosError> => {
-      let success = false;
-      try {
-        const userData = await UserRepository.create(body);
-        if (cookies && userData?.user?.token) {
-          await cookies().set("access_token", userData.user.token);
-          success = true;
-        }
-        return userData;
-      } catch (e) {
-        const error = e as AxiosError;
-        return error;
-      } finally {
-        if (success && redirect) {
-          redirect("/users");
-        }
+      const userData = await UserRepository.create(body);
+      const token = userData?.user?.token;
+      if (cookies && token && redirect) {
+        await cookies().set("access_token", token);
+        redirect("/users");
       }
+      return userData;
     },
+
     update: async (
       body: UserUpdateUserParams
     ): Promise<UserUpdate | AxiosError> => {
-      try {
-        const userData = await UserRepository.update(body);
-        return userData;
-      } catch (e) {
-        const error = e as AxiosError;
-        return error;
-      }
+      const userData = await UserRepository.update(body);
+      return userData;
     },
   };
 }

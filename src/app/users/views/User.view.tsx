@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import useGetUsersVM from './useGetUsers.vm'
 export default function UsersView() {
   const { data, isLoading } = useGetUsersVM();
