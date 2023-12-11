@@ -10,12 +10,8 @@ import type {
 function UserController(UserService: IUserService) {
   return {
     async getCurrentUser() {
-      const userData: UserCurrent | null = await UserService.getUser();
-      if (userData) {
-        const { user } = userData;
-        return user;
-      }
-      return null;
+      const userData: UserCurrent | any = await UserService.getUser();
+      return userData.user;
     },
     async userRegister(params: UserRegisterParams) {
       const requestBody: UserRegisterUserParams = {

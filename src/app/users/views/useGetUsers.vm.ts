@@ -2,8 +2,11 @@ import UserReactQuery from "@/modules/users/presentations/reactQuery/UserReactQu
 
 const { useGetCurrentUser } = UserReactQuery();
 function useGetUsersVM() {
-  const { isLoading, data } = useGetCurrentUser();
-  console.log("data :>> ", data);
+  const { isLoading, data, isError, error } = useGetCurrentUser();
+  console.log("useGetUsersVM :>> ", {
+    error: error,
+    isError,
+  });
   return {
     isLoading,
     data,
