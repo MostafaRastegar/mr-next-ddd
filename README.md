@@ -21,13 +21,13 @@ root
 │   └─ users
 │      ├─ applications
 │      │ ├─ dtos
-│      │ │ └─ UserDTO.ts
+│      │ │  └─ UserDTO.ts
 │      │ └─ services
 │      │    ├─ IUserService.ts
 │      │    └─ UserService.ts
 │      ├─ domains
 │      │ ├─ models
-│      │ │ └─ User.ts
+│      │ │  └─ User.ts
 │      │ └─ repositories
 │      │    └─ IUserRepository.ts
 │      ├─ infrastructure
@@ -36,7 +36,9 @@ root
 │      │    └─ UserRestFullRepository.ts
 │      └─ presentations
 │         ├─ controllers
-│         │ └─ UserController.ts
+│         │  └─ UserController.ts
+│         ├─ nextSSR
+│         │  └─ UserNextSSR.ts
 │         └─ reactQuery
 │            └─ UserReactQuery.ts
 │
@@ -51,32 +53,291 @@ root
 # Domain Layer
 
 The domain layer contains the business logic of the application.
-It includes the domain model `(models)` and the repository interface `(repositories)`.
-The domain model encapsulates the business rules and the repository interface defines the contract for interacting with the data source.
+It includes the domain model `(models)` and the repository interface `(repositories)`. <br>
+The `domain model` encapsulates the business rules and the `repository` interface defines the contract for interacting with the data source.
 
-# Application Layer
+```
+├─ domains
+│ ├─ models
+│ │ └─ User.ts
+│ └─ repositories
+    └─ IUserRepository.ts
+```
 
-The application layer contains the application services `(services)` and the data transfer objects `(dtos)`.
-The application services encapsulate the use-cases of the application and the data transfer objects shape the data for the client-side.
+- domains/models/User.ts
+
+```ts
+export interface User {
+  email: string;
+  username: string;
+  bio?: string;
+  image?: string;
+  token: string;
+}
+```
+
+- domains/repositories/IUserRepository.ts
+
+```ts
+export interface IUserRepository {
+  update(body: UserUpdateUserParams): Promise<UserUpdate>;
+  findByToken(token?: string): Promise<UserCurrent>;
+  findByEmailAndPassword(body: UserLoginUserParams): Promise<UserLogin>;
+  create(body: UserRegisterUserParams): Promise<UserRegister>;
+}
+```
 
 # Infrastructure Layer
 
-The infrastructure layer contains the infrastructure services `(infrastructure)` and the API repository `(restFull, graphQl,...)`.
-The infrastructure services handle the technical concerns of the application, such as database access and network communication.
-The API repository interacts with the API and maps the data to the domain model.
+The infrastructure layer contains the infrastructure services `(infrastructure)` and the API repository `(restFull, graphQl,...)`.<br>
+The infrastructure services handle the technical concerns of the application, such as database access and network communication.<br>
+The `API repository interacts` with the API and maps the data to the domain model.
+
+```
+├─ infrastructure
+│ ├─ index.ts
+│ └─ restFull
+│    └─ UserRestFullRepository.ts
+```
+
+- infrastructure/restFul/UserRestFullRepository.ts
+
+```ts
+function UserRepository(): IUserRepository {
+  return {
+    findByToken: async (): Promise<UserCurrent> => {
+      const response = await request.get(endpoints.USERS.GET_USER());
+      return response.data;
+    },
+    findByEmailAndPassword: async (
+      body: UserLoginUserParams
+    ): Promise<UserLogin> => {
+      const response = await requestWithoutAuth.post(
+        endpoints.USERS.POST_USERS_LOGIN(),
+        body
+      );
+      return response.data;
+    },
+
+    update: async (body: UserUpdateUserParams): Promise<UserUpdate> => {
+      const response = await request.put(endpoints.USERS.PUT_USER(), body);
+      return response.data;
+    },
+
+    create: async (body: UserRegisterUserParams): Promise<UserRegister> => {
+      const response = await requestWithoutAuth.post(
+        endpoints.USERS.POST_USERS(),
+        body
+      );
+
+      return response.data;
+    },
+  };
+}
+```
+
+# Application Layer
+
+The application layer contains the application services `(services)` and the data transfer objects `(dtos)`.<br>
+The application services encapsulate the `use-cases` of the application and the data transfer objects shape the data for the client-side.
+
+```
+├─ applications
+│ ├─ dtos
+│ │  └─ UserDTO.ts
+│ └─ services
+│    ├─ IUserService.ts
+│    └─ UserService.ts
+```
+
+- applications/services/IUserService.ts
+
+```ts
+export interface IUserService {
+  register(body: UserRegisterUserParams): Promise<UserCurrent | AxiosError>;
+  login(body: UserLoginUserParams): Promise<UserCurrent | AxiosError>;
+  update(body: UserUpdateUserParams): Promise<UserUpdate | AxiosError>;
+  getUser(): Promise<UserCurrent | AxiosError>;
+}
+```
+
+- applications/services/UserService.ts
+
+```ts
+function UserService(
+  UserRepository: IUserRepository,
+  redirect?: Function,
+  cookies: Function = cookiesClient
+): IUserService {
+  return {
+    getUser: async (): Promise<UserCurrent | AxiosError> => {
+      const userData = await UserRepository.findByToken();
+      return userData;
+    },
+
+    login: async (
+      body: UserLoginUserParams
+    ): Promise<UserCurrent | AxiosError> => {
+      const userData = await UserRepository.findByEmailAndPassword(body);
+      const token = userData?.user?.token;
+      if (token && redirect && cookies) {
+        await cookies().set("access_token", token);
+        redirect("/users");
+      }
+      return userData;
+    },
+
+    register: async (
+      body: UserRegisterUserParams
+    ): Promise<UserCurrent | AxiosError> => {
+      const userData = await UserRepository.create(body);
+      const token = userData?.user?.token;
+      if (cookies && token && redirect) {
+        await cookies().set("access_token", token);
+        redirect("/users");
+      }
+      return userData;
+    },
+
+    update: async (
+      body: UserUpdateUserParams
+    ): Promise<UserUpdate | AxiosError> => {
+      const userData = await UserRepository.update(body);
+      return userData;
+    },
+  };
+}
+```
 
 # Presentation Layer
 
-The presentation layer contains the controllers `(controllers)` and the query library `(reactQuery, SWR, ...)`. The controllers handle the user interactions and delegate the work to the application layer.
-For example: the React Query handles the state management and the data fetching for the React components.
+The presentation layer contains the controllers `(controllers)` and the query library `(reactQuery, SWR, ...)`. <br>
+The controllers handle the user interactions and delegate the work to the application layer. <br>
+`For example:` the `React Query` handles the state management and the data fetching for the React components.
 
+```
+└─ presentations
+   ├─ controllers
+   │  └─ UserController.ts
+   ├─ nextSSR
+   │  └─ UserNextSSR.ts
+   └─ reactQuery
+      └─ UserReactQuery.ts
+```
+
+- presentations/controllers/UserController.ts
+
+```ts
+function UserController(UserService: IUserService) {
+  return {
+    getCurrentUser: async () => {
+      const userData: UserCurrent | any = await UserService.getUser();
+      return userData.user;
+    },
+    userRegister: async (params: UserRegisterParams) => {
+      const requestBody: UserRegisterUserParams = {
+        user: params,
+      };
+      const userData = await UserService.register(requestBody);
+      return userData;
+    },
+
+    userLogin: async (params: UserLoginParams) => {
+      const requestBody: UserLoginUserParams = {
+        user: params,
+      };
+      const userData = await UserService.login(requestBody);
+
+      return userData;
+    },
+
+    userUpdate: async (email: string) => {
+      const requestBody: UserUpdateUserParams = {
+        user: { email },
+      };
+      const userData = await UserService.update(requestBody);
+      return userData;
+    },
+  };
+}
+```
+
+- presentations/nextSSR/UserNextSSR.ts
+
+```ts
+import { UserRepository } from "@/modules/users/infrastructure";
+import UserController from "@/modules/users/controllers/UserController";
+import UserService from "@/modules/users/applications/services/UserService";
+
+// constructor controller by repository and service functions
+const userService = UserService(UserRepository);
+const userController = UserController(userService);
+
+function UserNextSSR() {
+  return {
+    userLogin: async (formData: FormData) => {
+      const rawFormData: UserLoginParams = {
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
+      };
+      const result = await userController.userLogin(rawFormData);
+      return result;
+    },
+    userRegister: async (formData: FormData) => {
+      const rawFormData: UserRegisterParams = {
+        email: formData.get("email") as string,
+        username: formData.get("username") as string,
+        password: formData.get("password") as string,
+      };
+      const result = await userController.userRegister(rawFormData);
+
+      return result;
+    },
+  };
+}
+```
+
+- presentations/controllers/UserReactQuery.ts
+
+```ts
+import { UserRepository } from "@/modules/users/infrastructure";
+import UserController from "@/modules/users/controllers/UserController";
+import UserService from "@/modules/users/applications/services/UserService";
+
+// constructor controller by repository and service functions
+const userService = UserService(UserRepository);
+const userController = UserController(userService);
+
+function UserReactQuery() {
+  return {
+    useGetCurrentUser: () =>
+      useQuery<User | null>({
+        queryKey: ["user"],
+        queryFn: userController.getCurrentUser,
+      }),
+    useUserRegister: () =>
+      useMutation({
+        mutationFn: (formData: FormData) => {
+          const rawFormData: UserRegisterParams = {
+            email: formData.get("email") as string,
+            username: formData.get("username") as string,
+            password: formData.get("password") as string,
+          };
+          return userController.userRegister(rawFormData);
+        },
+      }),
+  };
+}
+```
+
+<!--
 # Testing
 
 In a DDD project, there are three main types of tests to consider:
 
 Unit tests: Focus on individual components or classes, testing the behavior of domain entities, value objects, and other building blocks.
 Integration tests: Test the interaction between different components, such as application layer use cases and infrastructure components like repositories or external service clients.
-End-to-end tests: Validate the entire system, including user interface and external integrations, ensuring that the application works correctly from the user’s perspective
+End-to-end tests: Validate the entire system, including user interface and external integrations, ensuring that the application works correctly from the user’s perspective -->
 
 # Communication
 
@@ -104,11 +365,10 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000/login](http://localhost:3000/login) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- username: {{EMAIL}}
+- password: {{PASSWORD}}
 
 ## Learn More
 
