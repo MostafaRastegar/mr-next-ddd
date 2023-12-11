@@ -4,10 +4,12 @@ import UserService from "@/modules/users/applications/services/UserService";
 import { UserRepository } from "@/modules/users/infrastructure";
 
 import { User, UserRegisterParams } from "@/modules/users/domains/models/User";
+
+// constructor controller by repository and service functions
 const userService = UserService(UserRepository);
 const userController = UserController(userService);
 
-function UserUseCase() {
+function UserReactQuery() {
   return {
     useGetCurrentUser: () =>
       useQuery<User | null>({
@@ -28,4 +30,4 @@ function UserUseCase() {
   };
 }
 
-export default UserUseCase;
+export default UserReactQuery;

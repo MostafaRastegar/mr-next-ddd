@@ -9,11 +9,11 @@ import type {
 } from "@/modules/users/domains/models/User";
 function UserController(UserService: IUserService) {
   return {
-    async getCurrentUser() {
+    getCurrentUser: async () => {
       const userData: UserCurrent | any = await UserService.getUser();
       return userData.user;
     },
-    async userRegister(params: UserRegisterParams) {
+    userRegister: async (params: UserRegisterParams) => {
       const requestBody: UserRegisterUserParams = {
         user: params,
       };
@@ -21,7 +21,7 @@ function UserController(UserService: IUserService) {
       return userData;
     },
 
-    async userLogin(params: UserLoginParams) {
+    userLogin: async (params: UserLoginParams) => {
       const requestBody: UserLoginUserParams = {
         user: params,
       };
@@ -30,7 +30,7 @@ function UserController(UserService: IUserService) {
       return userData;
     },
 
-    async userUpdate(email: string) {
+    userUpdate: async (email: string) => {
       const requestBody: UserUpdateUserParams = {
         user: { email },
       };

@@ -8,6 +8,7 @@ import {
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+// constructor controller by repository and service functions
 const userService = UserService(UserRepository, redirect, cookies);
 const userController = UserController(userService);
 
