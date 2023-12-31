@@ -9,6 +9,7 @@ import {
 } from "../models/User";
 
 export interface IUserRepository {
+  getUsers(): Promise<any>;
   update(body: UserUpdateUserParams): Promise<UserUpdate>;
   findByToken(token?: string): Promise<UserCurrent>;
   findByEmailAndPassword(body: UserLoginUserParams): Promise<UserLogin>;

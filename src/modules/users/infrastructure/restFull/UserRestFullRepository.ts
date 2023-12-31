@@ -12,6 +12,12 @@ import type { IUserRepository } from "@/modules/users/domains/repositories/IUser
 import request, { requestWithoutAuth } from "@/lib/request";
 function UserRepository(): IUserRepository {
   return {
+    getUsers: async (): Promise<UserCurrent> => {
+      const response = await requestWithoutAuth.get(
+        "https://jsonplaceholder.typicode.com/todos/1"
+      );
+      return response.data;
+    },
     findByToken: async (): Promise<UserCurrent> => {
       const response = await request.get(endpoints.USERS.GET_USER());
       return response.data;

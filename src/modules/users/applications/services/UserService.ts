@@ -17,6 +17,10 @@ function UserService(
   cookies: Function = cookiesClient
 ): IUserService {
   return {
+    getUsers: async (): Promise<any | AxiosError> => {
+      const userData = await UserRepository.getUsers();
+      return userData;
+    },
     getUser: async (): Promise<UserCurrent | AxiosError> => {
       const userData = await UserRepository.findByToken();
       return userData;

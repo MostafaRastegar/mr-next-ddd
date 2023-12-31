@@ -3,7 +3,8 @@ const endpoints = {
   USERS: {
     GET_USERS_ID: (id: number) =>
       `https://jsonplaceholder.typicode.com/users/${id}`,
-    GET_USER: () => `${HOST_URL}/user`,
+    // GET_USER: () => `${HOST_URL}/user`,
+    GET_USER: () => `/api/users`,
     PUT_USER: () => `${HOST_URL}/user`,
     POST_USERS_LOGIN: () => `${HOST_URL}/users/login`,
     POST_USERS: () => `${HOST_URL}/users`,

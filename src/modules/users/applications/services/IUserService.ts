@@ -12,4 +12,5 @@ export interface IUserService {
   login(body: UserLoginUserParams): Promise<UserCurrent | AxiosError>;
   update(body: UserUpdateUserParams): Promise<UserUpdate | AxiosError>;
   getUser(): Promise<UserCurrent | AxiosError>;
+  getUsers(): Promise<UserCurrent | AxiosError>;
 }

@@ -9,6 +9,10 @@ import type {
 } from "@/modules/users/domains/models/User";
 function UserController(UserService: IUserService) {
   return {
+    getUsers: async () => {
+      const userData = await UserService.getUsers();
+      return userData;
+    },
     getCurrentUser: async () => {
       const userData: UserCurrent | any = await UserService.getUser();
       return userData.user;

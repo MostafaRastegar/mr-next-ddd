@@ -14,6 +14,10 @@ const userController = UserController(userService);
 
 function UserNextSSR() {
   return {
+    getUsers: async () => {
+      const result = await userController.getUsers();
+      return result;
+    },
     userLogin: async (formData: FormData) => {
       const rawFormData: UserLoginParams = {
         email: formData.get("email") as string,
