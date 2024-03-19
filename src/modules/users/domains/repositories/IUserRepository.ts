@@ -1,17 +1,19 @@
+import { ResponseObject } from '@/modules/_modulesTypes';
 import {
-  UserLogin,
-  UserRegister,
-  UserUpdate,
   UserCurrent,
+  UserLogin,
   UserLoginUserParams,
+  UserRegister,
   UserRegisterUserParams,
+  UserUpdate,
   UserUpdateUserParams,
-} from "../models/User";
+} from '../models/User';
 
 export interface IUserRepository {
-  getUsers(): Promise<any>;
-  update(body: UserUpdateUserParams): Promise<UserUpdate>;
-  findByToken(token?: string): Promise<UserCurrent>;
-  findByEmailAndPassword(body: UserLoginUserParams): Promise<UserLogin>;
-  create(body: UserRegisterUserParams): Promise<UserRegister>;
+  update(body: UserUpdateUserParams): Promise<ResponseObject<UserUpdate>>;
+  findByToken(): Promise<ResponseObject<UserCurrent>>;
+  findByEmailAndPassword(
+    body: UserLoginUserParams,
+  ): Promise<ResponseObject<UserLogin>>;
+  create(body: UserRegisterUserParams): Promise<ResponseObject<UserRegister>>;
 }

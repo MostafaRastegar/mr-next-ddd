@@ -1,4 +1,4 @@
-import UserRestFullRepository from "./restFull/UserRestFullRepository";
+import UserRestFullRepository from './restFull/UserRestFullRepository';
 
 const UserRepository = UserRestFullRepository();
 

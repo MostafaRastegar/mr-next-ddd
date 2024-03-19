@@ -1,50 +1,38 @@
-import endpoints from "@/constants/endpoints";
+import endpoints from '@/constants/endpoints';
+import { serviceHandler } from '@/helpers/serviceHandler';
 import type {
+  UserCurrent,
   UserLogin,
   UserLoginUserParams,
-  UserRegisterUserParams,
-  UserUpdateUserParams,
   UserRegister,
+  UserRegisterUserParams,
   UserUpdate,
-  UserCurrent,
-} from "@/modules/users/domains/models/User";
-import type { IUserRepository } from "@/modules/users/domains/repositories/IUserRepository";
-import request, { requestWithoutAuth } from "@/lib/request";
+  UserUpdateUserParams,
+} from '@/modules/users/domains/models/User';
+import type { IUserRepository } from '@/modules/users/domains/repositories/IUserRepository';
+import request, { requestWithoutAuth } from '@/utils/request';
+
 function UserRepository(): IUserRepository {
   return {
-    getUsers: async (): Promise<UserCurrent> => {
-      const response = await requestWithoutAuth.get(
-        "https://jsonplaceholder.typicode.com/todos/1"
-      );
-      return response.data;
-    },
-    findByToken: async (): Promise<UserCurrent> => {
-      const response = await request.get(endpoints.USERS.GET_USER());
-      return response.data;
-    },
-    findByEmailAndPassword: async (
-      body: UserLoginUserParams
-    ): Promise<UserLogin> => {
-      const response = await requestWithoutAuth.post(
-        endpoints.USERS.POST_USERS_LOGIN(),
-        body
-      );
-      return response.data;
-    },
+    findByToken: () =>
+      serviceHandler<UserCurrent>(() =>
+        request.get(endpoints.USERS.GET_USER()),
+      ),
 
-    update: async (body: UserUpdateUserParams): Promise<UserUpdate> => {
-      const response = await request.put(endpoints.USERS.PUT_USER(), body);
-      return response.data;
-    },
+    findByEmailAndPassword: (body: UserLoginUserParams) =>
+      serviceHandler<UserLogin>(() =>
+        requestWithoutAuth.post(endpoints.USERS.POST_USERS_LOGIN(), body),
+      ),
 
-    create: async (body: UserRegisterUserParams): Promise<UserRegister> => {
-      const response = await requestWithoutAuth.post(
-        endpoints.USERS.POST_USERS(),
-        body
-      );
+    update: (body: UserUpdateUserParams) =>
+      serviceHandler<UserUpdate>(() =>
+        request.put(endpoints.USERS.PUT_USER(), body),
+      ),
 
-      return response.data;
-    },
+    create: (body: UserRegisterUserParams) =>
+      serviceHandler<UserRegister>(() =>
+        requestWithoutAuth.post(endpoints.USERS.POST_USERS(), body),
+      ),
   };
 }
 

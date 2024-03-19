@@ -1,10 +1,10 @@
+// const HOST_URL = process.env.HOST_URL;
+const HOST_URL = 'https://api.realworld.io/api';
 const endpoints = {
-  USER: {},
   USERS: {
     GET_USERS_ID: (id: number) =>
       `https://jsonplaceholder.typicode.com/users/${id}`,
-    // GET_USER: () => `${HOST_URL}/user`,
-    GET_USER: () => `/api/users`,
+    GET_USER: () => `${HOST_URL}/user`,
     PUT_USER: () => `${HOST_URL}/user`,
     POST_USERS_LOGIN: () => `${HOST_URL}/users/login`,
     POST_USERS: () => `${HOST_URL}/users`,
@@ -18,8 +18,5 @@ const endpoints = {
     GET_TAGS: () => `${HOST_URL}/tags`,
   },
 };
-
-// const HOST_URL = process.env.HOST_URL;
-const HOST_URL = "https://api.realworld.io/api";
 
 export default endpoints;

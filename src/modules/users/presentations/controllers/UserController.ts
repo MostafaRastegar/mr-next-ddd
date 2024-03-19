@@ -1,45 +1,35 @@
-import type { IUserService } from "@/modules/users/applications/services/IUserService";
 import type {
   UserLoginParams,
-  UserRegisterParams,
-  UserCurrent,
-  UserRegisterUserParams,
   UserLoginUserParams,
+  UserRegisterParams,
+  UserRegisterUserParams,
   UserUpdateUserParams,
-} from "@/modules/users/domains/models/User";
+} from '@/modules/users/domains/models/User';
+import type { IUserService } from '@/modules/users/services/IUserService';
+
 function UserController(UserService: IUserService) {
   return {
-    getUsers: async () => {
-      const userData = await UserService.getUsers();
-      return userData;
-    },
-    getCurrentUser: async () => {
-      const userData: UserCurrent | any = await UserService.getUser();
-      return userData.user;
-    },
-    userRegister: async (params: UserRegisterParams) => {
+    getCurrentUser: () => UserService.getUser(),
+
+    userRegister: (params: UserRegisterParams) => {
       const requestBody: UserRegisterUserParams = {
         user: params,
       };
-      const userData = await UserService.register(requestBody);
-      return userData;
+      return UserService.register(requestBody);
     },
 
-    userLogin: async (params: UserLoginParams) => {
+    userLogin: (params: UserLoginParams) => {
       const requestBody: UserLoginUserParams = {
         user: params,
       };
-      const userData = await UserService.login(requestBody);
-
-      return userData;
+      return UserService.login(requestBody);
     },
 
-    userUpdate: async (email: string) => {
+    userUpdate: (email: string) => {
       const requestBody: UserUpdateUserParams = {
         user: { email },
       };
-      const userData = await UserService.update(requestBody);
-      return userData;
+      return UserService.update(requestBody);
     },
   };
 }
