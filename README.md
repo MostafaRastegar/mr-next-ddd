@@ -80,10 +80,12 @@ export interface User {
 
 ```ts
 export interface IUserRepository {
-  update(body: UserUpdateUserParams): Promise<UserUpdate>;
-  findByToken(token?: string): Promise<UserCurrent>;
-  findByEmailAndPassword(body: UserLoginUserParams): Promise<UserLogin>;
-  create(body: UserRegisterUserParams): Promise<UserRegister>;
+  update(body: UserUpdateParams): Promise<ResponseObject<UserUpdate>>;
+  findByToken(): Promise<ResponseObject<UserCurrent>>;
+  findByEmailAndPassword(
+    body: UserLoginParams,
+  ): Promise<ResponseObject<UserLogin>>;
+  create(body: UserRegisterParams): Promise<ResponseObject<UserRegister>>;
 }
 ```
 
@@ -105,33 +107,25 @@ The `API repository interacts` with the API and maps the data to the domain mode
 ```ts
 function UserRepository(): IUserRepository {
   return {
-    findByToken: async (): Promise<UserCurrent> => {
-      const response = await request.get(endpoints.USERS.GET_USER());
-      return response.data;
-    },
-    findByEmailAndPassword: async (
-      body: UserLoginUserParams
-    ): Promise<UserLogin> => {
-      const response = await requestWithoutAuth.post(
-        endpoints.USERS.POST_USERS_LOGIN(),
-        body
-      );
-      return response.data;
-    },
+    findByToken: () =>
+      serviceHandler<UserCurrent>(() =>
+        request.get(endpoints.USERS.GET_USER()),
+      ),
 
-    update: async (body: UserUpdateUserParams): Promise<UserUpdate> => {
-      const response = await request.put(endpoints.USERS.PUT_USER(), body);
-      return response.data;
-    },
+    findByEmailAndPassword: (body: UserLoginParams) =>
+      serviceHandler<UserLogin>(() =>
+        requestWithoutAuth.post(endpoints.USERS.POST_USERS_LOGIN(), body),
+      ),
 
-    create: async (body: UserRegisterUserParams): Promise<UserRegister> => {
-      const response = await requestWithoutAuth.post(
-        endpoints.USERS.POST_USERS(),
-        body
-      );
+    update: (body: UserUpdateParams) =>
+      serviceHandler<UserUpdate>(() =>
+        request.put(endpoints.USERS.PUT_USER(), body),
+      ),
 
-      return response.data;
-    },
+    create: (body: UserRegisterParams) =>
+      serviceHandler<UserRegister>(() =>
+        requestWithoutAuth.post(endpoints.USERS.POST_USERS(), body),
+      ),
   };
 }
 ```
@@ -154,10 +148,10 @@ The application services encapsulate the `use-cases` of the application and the 
 
 ```ts
 export interface IUserService {
-  register(body: UserRegisterUserParams): Promise<UserCurrent | AxiosError>;
-  login(body: UserLoginUserParams): Promise<UserCurrent | AxiosError>;
-  update(body: UserUpdateUserParams): Promise<UserUpdate | AxiosError>;
-  getUser(): Promise<UserCurrent | AxiosError>;
+  register(body: UserRegisterParams): Promise<ResponseObject<UserCurrent>>;
+  login(body: UserLoginParams): Promise<ResponseObject<UserCurrent>>;
+  update(body: UserUpdateParams): Promise<ResponseObject<UserUpdate>>;
+  getUser(): Promise<ResponseObject<UserCurrent>>;
 }
 ```
 
@@ -167,44 +161,39 @@ export interface IUserService {
 function UserService(
   UserRepository: IUserRepository,
   redirect?: Function,
-  cookies: Function = cookiesClient
+  cookies: Function = cookiesClient,
 ): IUserService {
   return {
-    getUser: async (): Promise<UserCurrent | AxiosError> => {
-      const userData = await UserRepository.findByToken();
-      return userData;
-    },
+    getUser: () => serviceHandler<UserCurrent>(UserRepository.findByToken),
 
-    login: async (
-      body: UserLoginUserParams
-    ): Promise<UserCurrent | AxiosError> => {
-      const userData = await UserRepository.findByEmailAndPassword(body);
-      const token = userData?.user?.token;
-      if (token && redirect && cookies) {
-        await cookies().set("access_token", token);
-        redirect("/users");
-      }
-      return userData;
-    },
+    login: (body: UserLoginParams) =>
+      serviceHandler<UserLogin>(
+        () => UserRepository.findByEmailAndPassword(body),
+        {
+          onSuccess: (response) => {
+            console.log('service onSuccess :>> ', response);
+            const token = response?.data.user?.token;
+            if (token) {
+              cookies.set('access_token', token);
+            }
+          },
+        },
+      ),
 
-    register: async (
-      body: UserRegisterUserParams
-    ): Promise<UserCurrent | AxiosError> => {
-      const userData = await UserRepository.create(body);
-      const token = userData?.user?.token;
-      if (cookies && token && redirect) {
-        await cookies().set("access_token", token);
-        redirect("/users");
-      }
-      return userData;
-    },
+    register: (body: UserRegisterParams) =>
+      serviceHandler<UserRegister>(() => UserRepository.create(body), {
+        onSuccess: (response) => {
+          const token = response?.data.user?.token;
+          if (cookies && token && redirect) {
+            cookies.set('access_token', token);
+            redirect('/users');
+          }
+          return response;
+        },
+      }),
 
-    update: async (
-      body: UserUpdateUserParams
-    ): Promise<UserUpdate | AxiosError> => {
-      const userData = await UserRepository.update(body);
-      return userData;
-    },
+    update: (body: UserUpdateParams) =>
+      serviceHandler<UserUpdate>(() => UserRepository.update(body)),
   };
 }
 ```
@@ -230,33 +219,27 @@ The controllers handle the user interactions and delegate the work to the applic
 ```ts
 function UserController(UserService: IUserService) {
   return {
-    getCurrentUser: async () => {
-      const userData: UserCurrent | any = await UserService.getUser();
-      return userData.user;
-    },
-    userRegister: async (params: UserRegisterParams) => {
-      const requestBody: UserRegisterUserParams = {
+    getCurrentUser: () => UserService.getUser(),
+
+    userRegister: (params: UserRegisterParams) => {
+      const requestBody: UserRegisterParams = {
         user: params,
       };
-      const userData = await UserService.register(requestBody);
-      return userData;
+      return UserService.register(requestBody);
     },
 
-    userLogin: async (params: UserLoginParams) => {
-      const requestBody: UserLoginUserParams = {
+    userLogin: (params: UserLoginParams) => {
+      const requestBody: UserLoginParams = {
         user: params,
       };
-      const userData = await UserService.login(requestBody);
-
-      return userData;
+      return UserService.login(requestBody);
     },
 
-    userUpdate: async (email: string) => {
-      const requestBody: UserUpdateUserParams = {
+    userUpdate: (email: string) => {
+      const requestBody: UserUpdateParams = {
         user: { email },
       };
-      const userData = await UserService.update(requestBody);
-      return userData;
+      return UserService.update(requestBody);
     },
   };
 }
@@ -265,9 +248,9 @@ function UserController(UserService: IUserService) {
 - presentations/nextSSR/UserNextSSR.ts
 
 ```ts
-import { UserRepository } from "@/modules/users/infrastructure";
-import UserController from "@/modules/users/controllers/UserController";
-import UserService from "@/modules/users/applications/services/UserService";
+import UserService from '@/modules/users/applications/services/UserService';
+import UserController from '@/modules/users/controllers/UserController';
+import { UserRepository } from '@/modules/users/infrastructure';
 
 // constructor controller by repository and service functions
 const userService = UserService(UserRepository);
@@ -275,23 +258,20 @@ const userController = UserController(userService);
 
 function UserNextSSR() {
   return {
-    userLogin: async (formData: FormData) => {
+    userLogin: (formData: FormData) => {
       const rawFormData: UserLoginParams = {
-        email: formData.get("email") as string,
-        password: formData.get("password") as string,
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
       };
-      const result = await userController.userLogin(rawFormData);
-      return result;
+      return userController.userLogin(rawFormData);
     },
-    userRegister: async (formData: FormData) => {
+    userRegister: (formData: FormData) => {
       const rawFormData: UserRegisterParams = {
-        email: formData.get("email") as string,
-        username: formData.get("username") as string,
-        password: formData.get("password") as string,
+        email: formData.get('email') as string,
+        username: formData.get('username') as string,
+        password: formData.get('password') as string,
       };
-      const result = await userController.userRegister(rawFormData);
-
-      return result;
+      return userController.userRegister(rawFormData);
     },
   };
 }
@@ -300,9 +280,9 @@ function UserNextSSR() {
 - presentations/controllers/UserReactQuery.ts
 
 ```ts
-import { UserRepository } from "@/modules/users/infrastructure";
-import UserController from "@/modules/users/controllers/UserController";
-import UserService from "@/modules/users/applications/services/UserService";
+import UserService from '@/modules/users/applications/services/UserService';
+import UserController from '@/modules/users/controllers/UserController';
+import { UserRepository } from '@/modules/users/infrastructure';
 
 // constructor controller by repository and service functions
 const userService = UserService(UserRepository);
@@ -311,17 +291,40 @@ const userController = UserController(userService);
 function UserReactQuery() {
   return {
     useGetCurrentUser: () =>
-      useQuery<User | null>({
-        queryKey: ["user"],
+      useQuery<ResponseObject<UserCurrent>>({
+        queryKey: ['user'],
         queryFn: userController.getCurrentUser,
       }),
+
+    useUserLogin: () => {
+      const router = useRouter();
+      const searchParams = useSearchParams();
+      return useMutation({
+        mutationFn: ({ username, password }) => {
+          const rawFormData: UserLoginParams = {
+            username,
+            password,
+          };
+          return userController.userLogin(rawFormData);
+        },
+        onSuccess(response) {
+          console.log('onSuccess :>> ', response);
+          const nextUrl = searchParams.get('next');
+          router.push(nextUrl ?? '/');
+        },
+        onError(error) {
+          console.log('error :>> ', error);
+        },
+      });
+    },
+
     useUserRegister: () =>
       useMutation({
         mutationFn: (formData: FormData) => {
           const rawFormData: UserRegisterParams = {
-            email: formData.get("email") as string,
-            username: formData.get("username") as string,
-            password: formData.get("password") as string,
+            email: formData.get('email') as string,
+            username: formData.get('username') as string,
+            password: formData.get('password') as string,
           };
           return userController.userRegister(rawFormData);
         },
