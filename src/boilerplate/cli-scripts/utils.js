@@ -1,22 +1,22 @@
 #!/usr/bin/env node
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 function entityNameToUpperCase(arg) {
   const entityName = arg.charAt(0).toUpperCase() + arg.slice(1);
 
   if (!entityName) {
-    console.error("Please provide a name for the entity");
+    console.error('Please provide a name for the entity');
     return process.exit(1);
   }
 
   return entityName;
 }
 
-function directoryGenerator({ directories, entityName, scope, dirName = "" }) {
+function directoryGenerator({ directories, entityName, scope, dirName = '' }) {
   const entityDirectory = path.join(
     process.cwd(),
-    `src/modules/${entityName.toLowerCase()}/${scope}/${dirName}`
+    `src/modules/${entityName.toLowerCase()}/${scope}/${dirName}`,
   );
 
   if (fs.existsSync(entityDirectory)) {
@@ -35,7 +35,7 @@ function directoryGenerator({ directories, entityName, scope, dirName = "" }) {
 function nestedDirectoryGenerator(entityName, scope, arr) {
   const basePath = path.join(
     process.cwd(),
-    `src/modules/${entityName.toLowerCase()}/${scope}`
+    `src/modules/${entityName.toLowerCase()}/${scope}`,
   );
   const directories = {
     basePath,

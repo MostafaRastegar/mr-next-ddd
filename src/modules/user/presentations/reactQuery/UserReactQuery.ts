@@ -1,9 +1,10 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ResponseObject } from '@/modules/_modulesTypes';
+import type { ResponseObject } from '@/boilerplate/_modulesTypes';
 import type {
   User,
   UserCreateParams,
+  UserCurrent,
   UserLoginParams,
 } from '../../domains/models/User';
 import { UserRepository } from '../../infrastructure';
@@ -16,7 +17,7 @@ const userController = UserController(userService);
 export function UserReactQuery() {
   return {
     useGetCurrentUser: () =>
-      useQuery<ResponseObject<User>>({
+      useQuery<ResponseObject<UserCurrent>>({
         queryKey: ['User'],
         queryFn: userController.getCurrentUser,
       }),

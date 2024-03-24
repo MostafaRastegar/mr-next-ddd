@@ -87,7 +87,7 @@ const items: MenuItem[] = [
 ];
 
 const MainMenu = () => {
-  const t = useTranslations('IndexPage');
+  const t = useTranslations('Boilerplate');
   console.log('object :>> ', t('title'));
   return (
     <Menu

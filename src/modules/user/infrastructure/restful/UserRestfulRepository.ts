@@ -1,6 +1,6 @@
+import { serviceHandler } from '@/boilerplate/helpers/serviceHandler';
+import request, { requestWithoutAuth } from '@/boilerplate/utils/request';
 import endpoints from '@/constants/endpoints';
-import { serviceHandler } from '@/helpers/serviceHandler';
-import request, { requestWithoutAuth } from '@/utils/request';
 import type {
   User,
   UserCreate,

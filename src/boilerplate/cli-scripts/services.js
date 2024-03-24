@@ -26,7 +26,7 @@ generateFile(files, entityName);
 
 function _generateContent1(entity) {
   return `import Cookies from 'universal-cookie';
-import { serviceHandler } from '@/helpers/serviceHandler';
+import { serviceHandler } from '@/boilerplate/helpers/serviceHandler';
 import type {
   ${entity},
   ${entity}Create,
@@ -68,10 +68,11 @@ function ${entity}Service(
   };
 }
 
-export default ${entity}Service;`;
+export default ${entity}Service;
+`;
 }
 function _generateContent2(entity) {
-  return `import { ResponseObject } from '@/modules/_modulesTypes';
+  return `import type { ResponseObject } from '@/boilerplate/_modulesTypes';
 import type {
   ${entity},
   ${entity}Create,
@@ -87,5 +88,6 @@ export interface I${entity}Service {
   update(body: ${entity}UpdateParams): Promise<ResponseObject<${entity}Update>>;
   getCurrent${entity}(): Promise<ResponseObject<${entity}>>;
   remove(body: ${entity}DeleteParams): Promise<ResponseObject<${entity}Delete>>;
-}`;
+}
+`;
 }

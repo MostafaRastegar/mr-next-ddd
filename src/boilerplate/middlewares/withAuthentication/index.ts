@@ -3,7 +3,7 @@ import {
   type NextRequest,
   NextResponse,
 } from 'next/server';
-import { verifyJwtToken } from '@/helpers/auth';
+import { verifyJwtToken } from '@/boilerplate/helpers/auth';
 import { CustomMiddleware } from '../chain';
 
 const AUTH_PAGES = ['/login', '/register', '/'];

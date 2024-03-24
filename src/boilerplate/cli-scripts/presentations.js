@@ -13,7 +13,7 @@ const entityName = entityNameToUpperCase(argv);
 const { controllersPath, reactQueryPath } = nestedDirectoryGenerator(
   entityName,
   'presentations',
-  ['controllers', 'reactQuery']
+  ['controllers', 'reactQuery'],
 );
 
 const files = [
@@ -30,12 +30,12 @@ const files = [
 generateFile(files, entityName);
 
 function _generateContent1(entity) {
-  return `import type { I${entity}Service } from '../../services/I${entity}Service';
-import type {
+  return `import type {
   ${entity}CreateParams,
   ${entity}DeleteParams,
   ${entity}UpdateParams,
 } from '../../domains/models/${entity}';
+import type { I${entity}Service } from '../../services/I${entity}Service';
 
 function ${entity}Controller(${entity}Service: I${entity}Service) {
   return {
@@ -61,17 +61,18 @@ function ${entity}Controller(${entity}Service: I${entity}Service) {
   };
 }
 
-export default ${entity}Controller;`;
+export default ${entity}Controller;
+`;
 }
 
 function _generateContent2(entity) {
   return `import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ResponseObject } from '@/modules/_modulesTypes';
+import type { ResponseObject } from '@/boilerplate/_modulesTypes';
+import type { ${entity}, ${entity}CreateParams } from '../../domains/models/${entity}';
 import { ${entity}Repository } from '../../infrastructure';
 import ${entity}Service from '../../services/${entity}Service';
 import ${entity}Controller from '../controllers/${entity}Controller';
-import type { ${entity}, ${entity}CreateParams } from '../../domains/models/${entity}';
 
 const ${entity.toLowerCase()}Service = ${entity}Service(${entity}Repository);
 const ${entity.toLowerCase()}Controller = ${entity}Controller(${entity.toLowerCase()}Service);
@@ -106,5 +107,6 @@ export function ${entity}ReactQuery() {
       });
     },
   };
-}`;
+}
+`;
 }

@@ -1,6 +1,6 @@
-import { chain } from '@/middlewares/chain';
-import { withAuthentication } from '@/middlewares/withAuthentication';
-import { withIntl } from './middlewares/withIntl';
+import { chain } from '@/boilerplate/middlewares/chain';
+import { withAuthentication } from '@/boilerplate/middlewares/withAuthentication';
+import { withIntl } from '@/boilerplate/middlewares/withIntl';
 
 export default chain([withIntl, withAuthentication]);
 

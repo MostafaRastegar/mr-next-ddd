@@ -1,4 +1,4 @@
-import { ResponseObject } from '@/modules/_modulesTypes';
+import type { ResponseObject } from '@/boilerplate/_modulesTypes';
 
 interface ServiceResponseHandlerProps<T> {
   onSuccess?: (response: ResponseObject<T>) => any;

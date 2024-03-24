@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from 'antd';
-import { User } from '@/modules/users/domains/models/User';
+import { User } from '@/modules/user/domains/models/User';
 
 interface UserViewProps {
   data?: User;

@@ -4,10 +4,10 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { redirect, usePathname } from 'next/navigation';
 import { ConfigProvider, theme } from 'antd';
 import { Layout } from 'antd';
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
-import SideBar from '@/components/SideBar';
-import { ThemeContextProvider } from '@/contexts/Theme';
+import { ThemeContextProvider } from '@/boilerplate/contexts/Theme';
+import Footer from '@/boilerplate/kits/Footer';
+import Header from '@/boilerplate/kits/Header';
+import SideBar from '@/boilerplate/kits/SideBar';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 

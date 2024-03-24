@@ -5,7 +5,7 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import { Card, Skeleton, Statistic, Timeline } from 'antd';
-import Breadcrump from '@/components/Breadcrump';
+import Breadcrump from '@/boilerplate/kits/Breadcrump';
 import Lists from '../_components/Lists';
 import Tables from '../_components/Tables';
 

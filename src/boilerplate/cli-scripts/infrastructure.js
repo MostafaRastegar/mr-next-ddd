@@ -12,7 +12,7 @@ const entityName = entityNameToUpperCase(argv);
 const { restfulPath, basePath } = nestedDirectoryGenerator(
   entityName,
   'infrastructure',
-  ['restful']
+  ['restful'],
 );
 
 const files = [
@@ -29,9 +29,9 @@ const files = [
 generateFile(files, entityName);
 
 function _restfulRepositoryContent(entity) {
-  return `import endpoints from '@/constants/endpoints';
-import { serviceHandler } from '@/helpers/serviceHandler';
-import request, { requestWithoutAuth } from '@/utils/request';
+  return `import { serviceHandler } from '@/boilerplate/helpers/serviceHandler';
+import request, { requestWithoutAuth } from '@/boilerplate/utils/request';
+import endpoints from '@/constants/endpoints';
 import type {
   ${entityName},
   ${entityName}Create,
@@ -64,12 +64,14 @@ function ${entityName}Repository(): I${entityName}Repository {
   };
 }
 
-export default ${entityName}Repository;`;
+export default ${entityName}Repository;
+`;
 }
 function _restfulRepositoryInterface(entity) {
   return `import ${entity}RestfulRepository from './restful/${entity}RestfulRepository';
 
 const ${entity}Repository = ${entity}RestfulRepository();
 
-export { ${entity}Repository };`;
+export { ${entity}Repository };
+`;
 }

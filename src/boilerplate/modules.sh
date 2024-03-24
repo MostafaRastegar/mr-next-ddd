@@ -8,7 +8,7 @@ scopes='infrastructure models presentations services'
 
 for scope in $scopes
   do
-    node ./cli-scripts/"$scope".js $rout_name
+    node ./src/boilerplate/cli-scripts/"$scope".js $rout_name
   done
 
 

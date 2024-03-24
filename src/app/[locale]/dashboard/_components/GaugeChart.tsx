@@ -2,7 +2,7 @@
 
 import React, { useContext } from 'react';
 import { Column } from '@ant-design/plots';
-import { ThemeContext } from '@/contexts/Theme';
+import { ThemeContext } from '@/boilerplate/contexts/Theme';
 
 const GaugeChart = () => {
   const themeContextConsumer = useContext(ThemeContext);

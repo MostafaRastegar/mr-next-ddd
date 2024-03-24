@@ -13,7 +13,7 @@ const entityName = entityNameToUpperCase(argv);
 const { modelsPath, repositoriesPath } = nestedDirectoryGenerator(
   entityName,
   'domains',
-  ['models', 'repositories']
+  ['models', 'repositories'],
 );
 
 const files = [
@@ -33,7 +33,7 @@ function _generateContent1(entity) {
   return `export interface ${entity} {}
 export interface ${entity}Update {}
 export interface ${entity}UpdateParams {
-  ${entity.toLowerCase()}: { [v: string]: any };
+  [v: string]: any;
 }
 
 export interface ${entity}Create {}
@@ -45,11 +45,12 @@ export interface ${entity}CreateParams {
 export interface ${entity}Delete {}
 export interface ${entity}DeleteParams {
   ${entity.toLowerCase()}: { [v: string]: any };
-}`;
+}
+`;
 }
 
 function _generateContent2(entity) {
-  return `import { ResponseObject } from '@/modules/_modulesTypes';
+  return `import type { ResponseObject } from '@/boilerplate/_modulesTypes';
 import {
   ${entity},
   ${entity}Create,
@@ -65,5 +66,6 @@ export interface I${entity}Repository {
   find(): Promise<ResponseObject<${entity}>>;
   create(body: ${entity}CreateParams): Promise<ResponseObject<${entity}Create>>;
   delete(body: ${entity}DeleteParams): Promise<ResponseObject<${entity}Delete>>;
-}`;
+}
+`;
 }

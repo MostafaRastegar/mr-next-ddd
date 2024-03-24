@@ -1,4 +1,4 @@
-import { ResponseObject } from '@/modules/_modulesTypes';
+import type { ResponseObject } from '@/boilerplate/_modulesTypes';
 import {
   User,
   UserCreate,

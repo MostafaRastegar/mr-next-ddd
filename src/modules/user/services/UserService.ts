@@ -1,9 +1,10 @@
 import Cookies from 'universal-cookie';
-import { serviceHandler } from '@/helpers/serviceHandler';
+import { serviceHandler } from '@/boilerplate/helpers/serviceHandler';
 import type {
   User,
   UserCreate,
   UserCreateParams,
+  UserCurrent,
   UserLoginParams,
   UserUpdate,
   UserUpdateParams,
@@ -18,18 +19,22 @@ function UserService(
   redirect?: Function,
 ): IUserService {
   return {
-    getCurrentUser: () => serviceHandler<User>(UserRepository.findByToken),
+    getCurrentUser: () =>
+      serviceHandler<UserCurrent>(UserRepository.findByToken),
 
     login: (body: UserLoginParams) =>
-      serviceHandler<User>(() => UserRepository.findByEmailAndPassword(body), {
-        onSuccess: (response) => {
-          console.log('service onSuccess :>> ', response);
-          const token = response?.data.user?.token;
-          if (token) {
-            cookies.set('access_token', token);
-          }
+      serviceHandler<UserCurrent>(
+        () => UserRepository.findByEmailAndPassword(body),
+        {
+          onSuccess: (response) => {
+            console.log('service onSuccess :>> ', response);
+            const token = response?.data.user?.token;
+            if (token) {
+              cookies.set('access_token', token);
+            }
+          },
         },
-      }),
+      ),
 
     update: (body: UserUpdateParams) =>
       serviceHandler<UserUpdate>(() => UserRepository.update(body)),
