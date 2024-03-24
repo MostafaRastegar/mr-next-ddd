@@ -3,11 +3,11 @@ import { serviceHandler } from '@/helpers/serviceHandler';
 import type {
   UserCurrent,
   UserLogin,
-  UserLoginUserParams,
+  UserLoginParams,
   UserRegister,
-  UserRegisterUserParams,
+  UserRegisterParams,
   UserUpdate,
-  UserUpdateUserParams,
+  UserUpdateParams,
 } from '@/modules/users/domains/models/User';
 import { IUserRepository } from '@/modules/users/domains/repositories/IUserRepository';
 import { IUserService } from './IUserService';
@@ -21,7 +21,7 @@ function UserService(
   return {
     getUser: () => serviceHandler<UserCurrent>(UserRepository.findByToken),
 
-    login: (body: UserLoginUserParams) =>
+    login: (body: UserLoginParams) =>
       serviceHandler<UserLogin>(
         () => UserRepository.findByEmailAndPassword(body),
         {
@@ -35,7 +35,7 @@ function UserService(
         },
       ),
 
-    register: (body: UserRegisterUserParams) =>
+    register: (body: UserRegisterParams) =>
       serviceHandler<UserRegister>(() => UserRepository.create(body), {
         onSuccess: (response) => {
           const token = response?.data.user?.token;
@@ -47,7 +47,7 @@ function UserService(
         },
       }),
 
-    update: (body: UserUpdateUserParams) =>
+    update: (body: UserUpdateParams) =>
       serviceHandler<UserUpdate>(() => UserRepository.update(body)),
   };
 }

@@ -80,12 +80,12 @@ export interface User {
 
 ```ts
 export interface IUserRepository {
-  update(body: UserUpdateUserParams): Promise<ResponseObject<UserUpdate>>;
+  update(body: UserUpdateParams): Promise<ResponseObject<UserUpdate>>;
   findByToken(): Promise<ResponseObject<UserCurrent>>;
   findByEmailAndPassword(
-    body: UserLoginUserParams,
+    body: UserLoginParams,
   ): Promise<ResponseObject<UserLogin>>;
-  create(body: UserRegisterUserParams): Promise<ResponseObject<UserRegister>>;
+  create(body: UserRegisterParams): Promise<ResponseObject<UserRegister>>;
 }
 ```
 
@@ -112,17 +112,17 @@ function UserRepository(): IUserRepository {
         request.get(endpoints.USERS.GET_USER()),
       ),
 
-    findByEmailAndPassword: (body: UserLoginUserParams) =>
+    findByEmailAndPassword: (body: UserLoginParams) =>
       serviceHandler<UserLogin>(() =>
         requestWithoutAuth.post(endpoints.USERS.POST_USERS_LOGIN(), body),
       ),
 
-    update: (body: UserUpdateUserParams) =>
+    update: (body: UserUpdateParams) =>
       serviceHandler<UserUpdate>(() =>
         request.put(endpoints.USERS.PUT_USER(), body),
       ),
 
-    create: (body: UserRegisterUserParams) =>
+    create: (body: UserRegisterParams) =>
       serviceHandler<UserRegister>(() =>
         requestWithoutAuth.post(endpoints.USERS.POST_USERS(), body),
       ),
@@ -148,9 +148,9 @@ The application services encapsulate the `use-cases` of the application and the 
 
 ```ts
 export interface IUserService {
-  register(body: UserRegisterUserParams): Promise<ResponseObject<UserCurrent>>;
-  login(body: UserLoginUserParams): Promise<ResponseObject<UserCurrent>>;
-  update(body: UserUpdateUserParams): Promise<ResponseObject<UserUpdate>>;
+  register(body: UserRegisterParams): Promise<ResponseObject<UserCurrent>>;
+  login(body: UserLoginParams): Promise<ResponseObject<UserCurrent>>;
+  update(body: UserUpdateParams): Promise<ResponseObject<UserUpdate>>;
   getUser(): Promise<ResponseObject<UserCurrent>>;
 }
 ```
@@ -166,7 +166,7 @@ function UserService(
   return {
     getUser: () => serviceHandler<UserCurrent>(UserRepository.findByToken),
 
-    login: (body: UserLoginUserParams) =>
+    login: (body: UserLoginParams) =>
       serviceHandler<UserLogin>(
         () => UserRepository.findByEmailAndPassword(body),
         {
@@ -180,7 +180,7 @@ function UserService(
         },
       ),
 
-    register: (body: UserRegisterUserParams) =>
+    register: (body: UserRegisterParams) =>
       serviceHandler<UserRegister>(() => UserRepository.create(body), {
         onSuccess: (response) => {
           const token = response?.data.user?.token;
@@ -192,7 +192,7 @@ function UserService(
         },
       }),
 
-    update: (body: UserUpdateUserParams) =>
+    update: (body: UserUpdateParams) =>
       serviceHandler<UserUpdate>(() => UserRepository.update(body)),
   };
 }
@@ -222,21 +222,21 @@ function UserController(UserService: IUserService) {
     getCurrentUser: () => UserService.getUser(),
 
     userRegister: (params: UserRegisterParams) => {
-      const requestBody: UserRegisterUserParams = {
+      const requestBody: UserRegisterParams = {
         user: params,
       };
       return UserService.register(requestBody);
     },
 
     userLogin: (params: UserLoginParams) => {
-      const requestBody: UserLoginUserParams = {
+      const requestBody: UserLoginParams = {
         user: params,
       };
       return UserService.login(requestBody);
     },
 
     userUpdate: (email: string) => {
-      const requestBody: UserUpdateUserParams = {
+      const requestBody: UserUpdateParams = {
         user: { email },
       };
       return UserService.update(requestBody);

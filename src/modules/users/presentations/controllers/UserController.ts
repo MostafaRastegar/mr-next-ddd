@@ -1,9 +1,9 @@
 import type {
   UserLoginParams,
-  UserLoginUserParams,
+  UserLoginParams,
   UserRegisterParams,
-  UserRegisterUserParams,
-  UserUpdateUserParams,
+  UserRegisterParams,
+  UserUpdateParams,
 } from '@/modules/users/domains/models/User';
 import type { IUserService } from '@/modules/users/services/IUserService';
 
@@ -12,21 +12,18 @@ function UserController(UserService: IUserService) {
     getCurrentUser: () => UserService.getUser(),
 
     userRegister: (params: UserRegisterParams) => {
-      const requestBody: UserRegisterUserParams = {
-        user: params,
-      };
-      return UserService.register(requestBody);
+      return UserService.register(params);
     },
 
     userLogin: (params: UserLoginParams) => {
-      const requestBody: UserLoginUserParams = {
+      const requestBody: UserLoginParams = {
         user: params,
       };
       return UserService.login(requestBody);
     },
 
     userUpdate: (email: string) => {
-      const requestBody: UserUpdateUserParams = {
+      const requestBody: UserUpdateParams = {
         user: { email },
       };
       return UserService.update(requestBody);
