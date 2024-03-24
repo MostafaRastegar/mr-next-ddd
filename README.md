@@ -18,7 +18,7 @@ root
 │ ├─ constants
 │ │ └─ endpoints.ts
 │ ├─ modules
-│   └─ users
+│   └─ user
 │      ├─ applications
 │      │ ├─ dtos
 │      │ │  └─ UserDTO.ts
@@ -32,8 +32,8 @@ root
 │      │    └─ IUserRepository.ts
 │      ├─ infrastructure
 │      │ ├─ index.ts
-│      │ └─ restFull
-│      │    └─ UserRestFullRepository.ts
+│      │ └─ restful
+│      │    └─ UserRestfulRepository.ts
 │      └─ presentations
 │         ├─ controllers
 │         │  └─ UserController.ts
@@ -98,11 +98,11 @@ The `API repository interacts` with the API and maps the data to the domain mode
 ```
 ├─ infrastructure
 │ ├─ index.ts
-│ └─ restFull
-│    └─ UserRestFullRepository.ts
+│ └─ restful
+│    └─ UserRestfulRepository.ts
 ```
 
-- infrastructure/restFul/UserRestFullRepository.ts
+- infrastructure/restful/UserRestfulRepository.ts
 
 ```ts
 function UserRepository(): IUserRepository {
@@ -221,21 +221,21 @@ function UserController(UserService: IUserService) {
   return {
     getCurrentUser: () => UserService.getUser(),
 
-    userRegister: (params: UserRegisterParams) => {
+    register: (params: UserRegisterParams) => {
       const requestBody: UserRegisterParams = {
         user: params,
       };
       return UserService.register(requestBody);
     },
 
-    userLogin: (params: UserLoginParams) => {
+    login: (params: UserLoginParams) => {
       const requestBody: UserLoginParams = {
         user: params,
       };
       return UserService.login(requestBody);
     },
 
-    userUpdate: (email: string) => {
+    update: (email: string) => {
       const requestBody: UserUpdateParams = {
         user: { email },
       };
@@ -258,20 +258,20 @@ const userController = UserController(userService);
 
 function UserNextSSR() {
   return {
-    userLogin: (formData: FormData) => {
+    login: (formData: FormData) => {
       const rawFormData: UserLoginParams = {
         email: formData.get('email') as string,
         password: formData.get('password') as string,
       };
-      return userController.userLogin(rawFormData);
+      return userController.login(rawFormData);
     },
-    userRegister: (formData: FormData) => {
+    register: (formData: FormData) => {
       const rawFormData: UserRegisterParams = {
         email: formData.get('email') as string,
         username: formData.get('username') as string,
         password: formData.get('password') as string,
       };
-      return userController.userRegister(rawFormData);
+      return userController.register(rawFormData);
     },
   };
 }
@@ -372,6 +372,14 @@ Open [http://localhost:3000/login](http://localhost:3000/login) with your browse
 
 - username: {{EMAIL}}
 - password: {{PASSWORD}}
+
+## CLI
+
+You can use modules cli for generate DDD api folders and files in `/modules` folder
+
+```bash
+sh modules.sh
+```
 
 ## Learn More
 
