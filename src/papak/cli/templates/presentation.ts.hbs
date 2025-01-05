@@ -1,0 +1,57 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { {{> module_name }}Service } from "./{{> module_name }}.service";
+import {
+  {{> module_name }}Params,
+  {{> module_name }}CreateParams,
+  {{> module_name }}UpdateParams,
+} from "./domains/models/{{> module_name }}";
+import {
+  PaginationParams,
+} from 'papak/_modulesTypes';
+import { OpenNotificationWithIcon } from 'papak/utils/useNotification';
+
+const Service = {{> module_name }}Service();
+
+export function {{> module_name }}Presentation(openNotification?: OpenNotificationWithIcon) {
+  return {
+
+    useGetAll: (
+      params: {{> module_name }}Params & PaginationParams
+    ) =>
+      useQuery({
+        queryKey: ["{{> module_name }}-results", ...Object.values(params)],
+        queryFn: () => Service.getAll(params),
+      }),
+
+    useGet: (id: string, { enabled = true }) =>
+      useQuery({
+        queryKey: ["{{> module_name }}-result", id],
+        queryFn: () => Service.get(id),
+        enabled,
+      }),
+
+    useCreate: () => {
+      return useMutation({
+        mutationFn: (params: {{> module_name }}CreateParams) => {
+          return Service.create(params);
+        }
+      });
+    },
+
+    useUpdate: () => {
+      return useMutation({
+        mutationFn: (params: {{> module_name }}UpdateParams) => {
+          return Service.update(params);
+        }
+      });
+    },
+
+    useRemove: () => {
+      return useMutation({
+        mutationFn: ({ id }: { id: string }) => {
+          return Service.remove(id);
+        }
+      });
+    },
+  };
+}

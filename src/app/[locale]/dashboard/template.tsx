@@ -62,7 +62,7 @@ export default function Template({ children }: { children: ReactNode }) {
         isDarkMode={isDarkMode}
         handleThemeDirection={handleThemeDirection}
         isRtlMode={isRtlMode}
-        logoText="IP Address Management"
+        logoText="MY Dashboard"
         profileMenu={
           <Dropdown menu={{ items: profileItems }} trigger={['click']}>
             <a onClick={(e) => e.preventDefault()}>

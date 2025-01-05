@@ -20,7 +20,7 @@ export function LoginView() {
               alt="logo"
             />
             <h4 className="mb-8 mt-3 pb-1 text-2xl font-semibold">
-              IP Address Management
+              MY Dashboard
             </h4>
           </div>
 
@@ -70,9 +70,9 @@ export function LoginView() {
             </Form.Item>
           </Form>
           <p className="text-justify text-[13px] text-gray-600">
-            IPAM (IP Address Management) is the administration of DNS and DHCP,
-            which are the network services that assign and resolve IP addresses
-            to machines in a TCP/IP network. Simply put, IPAM is a means of
+            IPAM (MY Dashboard) is the administration of DNS and DHCP, which are
+            the network services that assign and resolve IP addresses to
+            machines in a TCP/IP network. Simply put, IPAM is a means of
             planning, tracking, and managing the Internet Protocol address space
             used in a network.
           </p>

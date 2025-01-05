@@ -1,0 +1,19 @@
+'use client';
+
+import { Suspense } from 'react';
+import { {{> component_partial_name }}ContextProvider } from './_viewModule/{{> partial_name }}.context';
+import { {{> component_partial_name }}View } from './_viewModule/{{> partial_name }}.view';
+
+export default function {{> component_partial_name }}Page() {
+  return (
+    <Suspense
+      fallback={
+        <p style=\{{ textAlign: 'center' }}>loading... on initial request</p>
+      }
+    >
+      <{{> component_partial_name }}ContextProvider>
+        <{{> component_partial_name }}View />
+      </{{> component_partial_name }}ContextProvider>
+    </Suspense>
+  );
+}

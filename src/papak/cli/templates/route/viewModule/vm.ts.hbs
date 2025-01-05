@@ -1,0 +1,60 @@
+import { useContext, useState } from 'react';
+import type { DispatchSetStateAction, RQResult } from 'papak/_utilsTypes';
+import { NotificationContext } from 'papak/configs/notificationContextProvider';
+import { useSearchParamsToObject } from 'papak/utils/useSearchParamsToObject';
+import { PaginationList } from 'papak/_modulesTypes';
+import { {{> module_name }}Presentation } from '@/modules/{{> module_name_small_case}}/{{> module_name }}.presentation';
+import {
+  {{> module_name }},
+  {{> module_name }}Params,
+  {{> module_name }}CreateParams,
+  {{> module_name }}UpdateParams,
+} from '@/modules/{{> module_name_small_case}}/domains/models/{{> module_name }}';
+
+export interface I{{> component_partial_name }}VM {
+  selectedRowState: {{> module_name }}[];
+  setSelectedRowsState: DispatchSetStateAction<{{> module_name }}[]>;
+  openEditModal: boolean;
+  setOpenEditModal: DispatchSetStateAction<boolean>;
+  openRemoveModal: boolean;
+  setOpenRemoveModal: DispatchSetStateAction<boolean>;
+  openAddModal: boolean;
+  setOpenAddModal: DispatchSetStateAction<boolean>;
+  getAll{{> module_name }}: RQResult<PaginationList<{{> module_name }}>>;
+  updateAction: RQMutationResult<null, {{> module_name }}UpdateParams>;
+  removeAction: RQMutationResult<null, { id: string }>;
+  addAction: RQMutationResult<null, {{> module_name }}CreateParams>;
+}
+export function use{{> component_partial_name }}VM(): I{{> component_partial_name }}VM {
+  const searchParams = useSearchParamsToObject() as unknown as {{> module_name }}Params;
+  const { openNotificationWithIcon } = useContext(NotificationContext);
+  const { useGetAll } = {{> module_name }}Presentation(openNotificationWithIcon);
+
+  const [selectedRowState, setSelectedRowsState] = useState<{{> module_name }}[]>(
+    [],
+  );
+
+  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+
+  const getAll{{> module_name }} = useGetAll(searchParams);
+  const updateAction = useUpdate();
+  const removeAction = useRemove();
+  const addAction = useCreate();
+
+  return {
+    selectedRowState,
+    setSelectedRowsState,
+    getAll{{> module_name }},
+    openEditModal,
+    setOpenEditModal,
+    updateAction,
+    openRemoveModal,
+    setOpenRemoveModal,
+    removeAction,
+    openAddModal,
+    setOpenAddModal,
+    addAction,
+  };
+}

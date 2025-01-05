@@ -1,0 +1,34 @@
+import { serviceHandler } from "papak/helpers/serviceHandler";
+import request from "papak/utils/request";
+import endpoints from "@/constants/endpoints";
+import type { I{{> module_name }}Service } from "./domains/I{{> module_name }}Service";
+
+export function {{> module_name }}Service(): I{{> module_name }}Service {
+  return {
+    getAll: (params) =>
+      serviceHandler(() =>
+        request().get(endpoints.{{> module_name_upper }}.GET_{{> module_name_upper }}(), {
+          params,
+        })
+      ),
+    get: (id) =>
+      serviceHandler(() =>
+        request().get(endpoints.{{> module_name_upper }}.GET_{{> module_name_upper }}_ID(id))
+      ),
+    create: (params) =>
+      serviceHandler(() =>
+        request().post(endpoints.{{> module_name_upper }}.POST_{{> module_name_upper }}(), params)
+      ),
+    update: ({ id, ...params }) =>
+      serviceHandler(() =>
+        request().put(
+          endpoints.{{> module_name_upper }}.PUT_{{> module_name_upper }}_ID(id?.toString()),
+          params
+        )
+      ),
+    remove: (id) =>
+      serviceHandler(() =>
+        request().delete(endpoints.{{> module_name_upper }}.DELETE_{{> module_name_upper }}_ID(id))
+      ),
+  };
+}

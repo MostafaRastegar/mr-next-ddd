@@ -1,0 +1,116 @@
+import { palettes } from './palettes';
+
+export const customTheme = {
+  token: {
+    colorPrimary: palettes.primary.main,
+    colorInfo: palettes.primary.main,
+    colorSuccess: palettes.success.main,
+    colorError: palettes.error.main,
+    colorBgBase: palettes.white,
+    colorTextBase: palettes.black,
+    borderRadius: 4,
+    wireframe: false,
+  },
+  components: {
+    Button: {
+      paddingInline: 16,
+      paddingInlineLG: 16,
+      paddingInlineSM: 8,
+      paddingBlockLG: 8,
+      controlHeight: 36,
+    },
+    Breadcrumb: {
+      itemColor: palettes.gray[600],
+      lastItemColor: palettes.black,
+      linkColor: palettes.gray[600],
+      separatorColor: palettes.gray[600],
+    },
+    Menu: {
+      itemSelectedBg: 'transparent',
+      itemHoverBg: 'transparent',
+      itemBg: 'transparent',
+      itemActiveBg: 'transparent',
+      subMenuItemBg: 'transparent',
+      darkSubMenuItemBg: 'transparent',
+      dropdownWidth: 264,
+
+      darkItemHoverColor: palettes.white,
+      darkItemSelectedColor: palettes.white,
+      darkItemColor: palettes.gray[500],
+
+      darkItemBg: palettes.black,
+
+      itemHeight: 36,
+      itemMarginBlock: 0,
+      itemPaddingInline: 7,
+      itemMarginInline: 0,
+      iconMarginInlineEnd: 8,
+      paddingXL: 0,
+      itemBorderRadius: 0,
+      subMenuItemBorderRadius: 0,
+      borderRadius: 0,
+      borderRadiusLG: 0,
+      fontSize: 15,
+      paddingXS: 0,
+    },
+    Pagination: {
+      itemActiveBg: palettes.white,
+      itemBg: palettes.white,
+      colorBgTextHover: palettes.gray[200],
+      controlOutline: 'white',
+      colorBorder: palettes.gray[300],
+      colorPrimary: palettes.black,
+      colorPrimaryHover: palettes.black,
+    },
+    Checkbox: {
+      lineWidth: 1,
+      lineHeight: 1.5714285714285714,
+      controlInteractiveSize: 20,
+    },
+    Form: {
+      labelHeight: 36,
+      labelFontSize: 13,
+    },
+    Input: {
+      controlHeight: 36,
+    },
+    DatePicker: {
+      controlHeight: 36,
+    },
+    Select: {
+      optionSelectedBg: palettes.primary.main,
+      controlHeight: 36,
+    },
+    Modal: {
+      titleColor: palettes.black,
+      colorBgMask: palettes.black,
+      borderRadiusLG: 8,
+    },
+    Layout: {
+      bodyBg: palettes.white,
+      headerBg: palettes.primary.main,
+      siderBg: palettes.primary.main,
+    },
+    Table: {
+      borderColor: palettes.gray[300],
+      expandIconBg: palettes.white,
+      filterDropdownBg: palettes.white,
+      filterDropdownMenuBg: palettes.white,
+      margin: 8,
+      padding: 8,
+      headerSortActiveBg: palettes.white,
+      headerSortHoverBg: palettes.white,
+      headerSplitColor: palettes.white,
+      rowExpandedBg: palettes.white,
+      headerBg: palettes.white,
+    },
+    Slider: {
+      dotSize: 4,
+      handleSize: 16,
+      handleLineWidth: 3,
+      railSize: 8,
+      trackBg: 'rgb(204, 202, 210)',
+      handleColor: 'rgba(255, 255, 255, 0.3)',
+    },
+  },
+};

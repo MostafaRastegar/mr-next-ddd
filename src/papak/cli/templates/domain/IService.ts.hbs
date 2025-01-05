@@ -1,0 +1,17 @@
+import { ResponseObject, PaginationList,PaginationParams } from 'papak/_modulesTypes';
+
+import {
+  {{> module_name }},
+  {{> module_name }}Params,
+  {{> module_name }}CreateParams,
+  {{> module_name }}UpdateParams,
+} from "./models/{{> module_name }}";
+export interface I{{> module_name }}Service {
+  getAll(
+    params: {{> module_name }}Params & PaginationParams,
+  ): Promise<ResponseObject<PaginationList<{{> module_name }}>>>;
+  get(id: string): Promise<ResponseObject<{{> module_name }}>>;
+  create(params: {{> module_name }}CreateParams): Promise<ResponseObject<null>>;
+  update(params: {{> module_name }}UpdateParams): Promise<ResponseObject<null>>;
+  remove(id: string): Promise<ResponseObject<null>>;
+}

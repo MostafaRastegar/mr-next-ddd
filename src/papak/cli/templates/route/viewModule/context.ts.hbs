@@ -1,0 +1,17 @@
+import { createContext, useContext } from 'react';
+import { I{{> component_partial_name }}VM, use{{> component_partial_name }}VM } from './{{> partial_name}}.vm';
+
+export const {{> component_partial_name }}Context = createContext({} as I{{> component_partial_name }}VM);
+export const use{{> component_partial_name }}Context = () => useContext({{> component_partial_name }}Context);
+export const {{> component_partial_name }}ContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const vmValues = use{{> component_partial_name }}VM();
+  return (
+    <{{> component_partial_name }}Context.Provider value={vmValues}>
+      {children}
+    </{{> component_partial_name }}Context.Provider>
+  );
+};
