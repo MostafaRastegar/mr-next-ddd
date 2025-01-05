@@ -12,42 +12,24 @@ An agile software development methodology is a great fit here because agile meth
 root
 ├─ src
 │ ├─ app
-│ ├─ hooks
-│ ├─ lib
-│ ├─ utils
 │ ├─ constants
 │ │ └─ endpoints.ts
 │ ├─ modules
 │   └─ user
-│      ├─ applications
-│      │ ├─ dtos
-│      │ │  └─ UserDTO.ts
-│      │ └─ services
-│      │    ├─ IUserService.ts
-│      │    └─ UserService.ts
 │      ├─ domains
 │      │ ├─ models
 │      │ │  └─ User.ts
-│      │ └─ repositories
-│      │    └─ IUserRepository.ts
-│      ├─ infrastructure
-│      │ ├─ index.ts
-│      │ └─ restful
-│      │    └─ UserRestfulRepository.ts
-│      └─ presentations
-│         ├─ controllers
-│         │  └─ UserController.ts
-│         ├─ nextSSR
-│         │  └─ UserNextSSR.ts
-│         └─ reactQuery
-│            └─ UserReactQuery.ts
-│
+│      │ └─ IUserRepository.ts
+│      │ └─ IUserService.ts
+│      │
+│      ├─ User.presentation.ts
+│      ├─ User.repository.ts
+│      └─ User.service.ts
+|
 ├─ .eslintrc.json
 ├─ .gitignore
 ├─ package.json
 └─ tsconfig.json
-
-
 
 
 ```
@@ -55,18 +37,18 @@ root
 # Domain Layer
 
 The domain layer contains the business logic of the application.
-It includes the domain model `(models)` and the repository interface `(repositories)`. <br>
+It includes the domain model `(models)` and the `repository, service` interface . <br/>
 The `domain model` encapsulates the business rules and the `repository` interface defines the contract for interacting with the data source.
 
 ```
 ├─ domains
 │ ├─ models
-│ │ └─ User.ts
-│ └─ repositories
-    └─ IUserRepository.ts
+│ │  └─ User.ts
+│ └─ IUserRepository.ts
+│ └─ IUserService.ts
 ```
 
-- domains/models/User.ts
+- user/domains/models/User.ts
 
 ```ts
 export interface User {
@@ -78,7 +60,7 @@ export interface User {
 }
 ```
 
-- domains/repositories/IUserRepository.ts
+- user/domains/IUserRepository.ts
 
 ```ts
 export interface IUserRepository {
@@ -86,25 +68,37 @@ export interface IUserRepository {
   findByToken(): Promise<ResponseObject<UserCurrent>>;
   findByEmailAndPassword(
     body: UserLoginParams,
-  ): Promise<ResponseObject<UserLogin>>;
-  create(body: UserRegisterParams): Promise<ResponseObject<UserRegister>>;
+  ): Promise<ResponseObject<UserCurrent>>;
+  create(body: UserCreateParams): Promise<ResponseObject<UserCreate>>;
+}
+```
+
+- user/domains/IUserService.ts
+
+```ts
+import { IUserRepository } from './IUserRepository';
+
+export interface IUserService {
+  login: IUserRepository['findByEmailAndPassword'];
+  register: IUserRepository['create'];
+  update: IUserRepository['update'];
+  getCurrentUser: IUserRepository['findByToken'];
 }
 ```
 
 # Infrastructure Layer
 
-The infrastructure layer contains the infrastructure services `(infrastructure)` and the API repository `(restFull, graphQl,...)`.<br>
-The infrastructure services handle the technical concerns of the application, such as database access and network communication.<br>
+The infrastructure layer contains the infrastructure services `(infrastructure)` and the API repository `(restFull, graphQl,...)`.<br/>
+The infrastructure services handle the technical concerns of the application, such as database access and network communication.<br/>
 The `API repository interacts` with the API and maps the data to the domain model.
 
 ```
-├─ infrastructure
-│ ├─ index.ts
-│ └─ restful
-│    └─ UserRestfulRepository.ts
+└─ user
+  ├─ ...
+  ├─ User.repository.ts
 ```
 
-- infrastructure/restful/UserRestfulRepository.ts
+- user/User.repository.ts
 
 ```ts
 function UserRepository(): IUserRepository {
@@ -115,17 +109,16 @@ function UserRepository(): IUserRepository {
       ),
 
     findByEmailAndPassword: (body: UserLoginParams) =>
-      serviceHandler<UserLogin>(() =>
+      serviceHandler<UserCurrent>(() =>
         requestWithoutAuth.post(endpoints.USERS.POST_USERS_LOGIN(), body),
       ),
-
     update: (body: UserUpdateParams) =>
       serviceHandler<UserUpdate>(() =>
         request.put(endpoints.USERS.PUT_USER(), body),
       ),
 
-    create: (body: UserRegisterParams) =>
-      serviceHandler<UserRegister>(() =>
+    create: (body: UserCreateParams) =>
+      serviceHandler<UserCreate>(() =>
         requestWithoutAuth.post(endpoints.USERS.POST_USERS(), body),
       ),
   };
@@ -134,180 +127,93 @@ function UserRepository(): IUserRepository {
 
 # Application Layer
 
-The application layer contains the application services `(services)` and the data transfer objects `(dtos)`.<br>
+The application layer contains the application services `(services)` and the data transfer objects `(dtos)`.<br/>
 The application services encapsulate the `use-cases` of the application and the data transfer objects shape the data for the client-side.
 
 ```
-├─ applications
-│ ├─ dtos
-│ │  └─ UserDTO.ts
-│ └─ services
-│    ├─ IUserService.ts
-│    └─ UserService.ts
+└─ user
+  ├─ ...
+  ├─ User.service.ts
 ```
 
-- applications/services/IUserService.ts
-
-```ts
-export interface IUserService {
-  register(body: UserRegisterParams): Promise<ResponseObject<UserCurrent>>;
-  login(body: UserLoginParams): Promise<ResponseObject<UserCurrent>>;
-  update(body: UserUpdateParams): Promise<ResponseObject<UserUpdate>>;
-  getUser(): Promise<ResponseObject<UserCurrent>>;
-}
-```
-
-- applications/services/UserService.ts
+- user/User.service.ts
 
 ```ts
 function UserService(
   UserRepository: IUserRepository,
   redirect?: Function,
-  cookies: Function = cookiesClient,
+): IUserService {
 ): IUserService {
   return {
-    getUser: () => serviceHandler<UserCurrent>(UserRepository.findByToken),
+    getCurrentUser: () => serviceHandler(UserRepository.findByToken),
 
     login: (body: UserLoginParams) =>
-      serviceHandler<UserLogin>(
-        () => UserRepository.findByEmailAndPassword(body),
-        {
-          onSuccess: (response) => {
-            console.log('service onSuccess :>> ', response);
-            const token = response?.data.user?.token;
-            if (token) {
-              cookies.set('access_token', token);
-            }
-          },
-        },
-      ),
-
-    register: (body: UserRegisterParams) =>
-      serviceHandler<UserRegister>(() => UserRepository.create(body), {
+      serviceHandler(() => UserRepository.findByEmailAndPassword(body), {
         onSuccess: (response) => {
-          const token = response?.data.user?.token;
-          if (cookies && token && redirect) {
+          const token = response?.data?.user?.token;
+          if (token) {
             cookies.set('access_token', token);
-            redirect('/users');
           }
-          return response;
         },
       }),
 
     update: (body: UserUpdateParams) =>
-      serviceHandler<UserUpdate>(() => UserRepository.update(body)),
+      serviceHandler(() => UserRepository.update(body)),
+
+    register: (body: UserCreateParams) =>
+      serviceHandler(() => UserRepository.create(body), {
+        onSuccess: (response) => {
+          const token = response?.data.user?.token;
+          if (cookies && token && redirect) {
+            cookies.set('access_token', token);
+            redirect('/');
+          }
+          return response;
+        },
+      }),
   };
 }
 ```
 
 # Presentation Layer
 
-The presentation layer contains the controllers `(controllers)` and the query library `(reactQuery, SWR, ...)`. <br>
-The controllers handle the user interactions and delegate the work to the application layer. <br>
+The presentation layer contains the controllers `(presentation)` and the query library `(reactQuery, SWR, ...)`. <br/>
+The controllers handle the user interactions and delegate the work to the application layer. <br/>
 `For example:` the `React Query` handles the state management and the data fetching for the React components.
 
 ```
-└─ presentations
-   ├─ controllers
-   │  └─ UserController.ts
-   ├─ nextSSR
-   │  └─ UserNextSSR.ts
-   └─ reactQuery
-      └─ UserReactQuery.ts
+└─ user
+  ├─ ...
+  ├─ User.presentation.ts
+
 ```
 
-- presentations/controllers/UserController.ts
+- user/User.presentation.ts
 
 ```ts
-function UserController(UserService: IUserService) {
-  return {
-    getCurrentUser: () => UserService.getUser(),
+const userService = UserService(UserRepository());
 
-    register: (params: UserRegisterParams) => {
-      const requestBody: UserRegisterParams = {
-        user: params,
-      };
-      return UserService.register(requestBody);
-    },
-
-    login: (params: UserLoginParams) => {
-      const requestBody: UserLoginParams = {
-        user: params,
-      };
-      return UserService.login(requestBody);
-    },
-
-    update: (email: string) => {
-      const requestBody: UserUpdateParams = {
-        user: { email },
-      };
-      return UserService.update(requestBody);
-    },
-  };
-}
-```
-
-- presentations/nextSSR/UserNextSSR.ts
-
-```ts
-import UserService from '@/modules/users/applications/services/UserService';
-import UserController from '@/modules/users/controllers/UserController';
-import { UserRepository } from '@/modules/users/infrastructure';
-
-// constructor controller by repository and service functions
-const userService = UserService(UserRepository);
-const userController = UserController(userService);
-
-function UserNextSSR() {
-  return {
-    login: (formData: FormData) => {
-      const rawFormData: UserLoginParams = {
-        email: formData.get('email') as string,
-        password: formData.get('password') as string,
-      };
-      return userController.login(rawFormData);
-    },
-    register: (formData: FormData) => {
-      const rawFormData: UserRegisterParams = {
-        email: formData.get('email') as string,
-        username: formData.get('username') as string,
-        password: formData.get('password') as string,
-      };
-      return userController.register(rawFormData);
-    },
-  };
-}
-```
-
-- presentations/controllers/UserReactQuery.ts
-
-```ts
-import UserService from '@/modules/users/applications/services/UserService';
-import UserController from '@/modules/users/controllers/UserController';
-import { UserRepository } from '@/modules/users/infrastructure';
-
-// constructor controller by repository and service functions
-const userService = UserService(UserRepository);
-const userController = UserController(userService);
-
-function UserReactQuery() {
+export function UserPresentation() {
   return {
     useGetCurrentUser: () =>
-      useQuery<ResponseObject<UserCurrent>>({
+      useQuery({
         queryKey: ['user'],
-        queryFn: userController.getCurrentUser,
+        queryFn: () => userService.getCurrentUser(),
       }),
 
     useUserLogin: () => {
       const router = useRouter();
       const searchParams = useSearchParams();
       return useMutation({
-        mutationFn: ({ username, password }) => {
+        mutationFn: () => {
           const rawFormData: UserLoginParams = {
-            username,
-            password,
+            user: {
+              email: '{{EMAIL}}',
+
+              password: '{{PASSWORD}}',
+            },
           };
-          return userController.userLogin(rawFormData);
+          return userService.login(rawFormData);
         },
         onSuccess(response) {
           console.log('onSuccess :>> ', response);
@@ -319,40 +225,67 @@ function UserReactQuery() {
         },
       });
     },
-
-    useUserRegister: () =>
-      useMutation({
-        mutationFn: (formData: FormData) => {
-          const rawFormData: UserRegisterParams = {
-            email: formData.get('email') as string,
-            username: formData.get('username') as string,
-            password: formData.get('password') as string,
-          };
-          return userController.userRegister(rawFormData);
-        },
-      }),
-  };
 }
 ```
 
-<!--
-# Testing
+## CLI Tools
 
-In a DDD project, there are three main types of tests to consider:
+This project utilizes `npm run cli` to automate the generation of modules, app routers, and endpoints in a structured manner. It helps streamline the development process by providing templates and predefined structures for common tasks.
 
-Unit tests: Focus on individual components or classes, testing the behavior of domain entities, value objects, and other building blocks.
-Integration tests: Test the interaction between different components, such as application layer use cases and infrastructure components like repositories or external service clients.
-End-to-end tests: Validate the entire system, including user interface and external integrations, ensuring that the application works correctly from the user’s perspective -->
+## Usage
 
-# Communication
+After run `npm run cli`:
 
-The communication and connection between the different layers and modules in your application are handled through the interfaces and the dependency injection.
+### Generating Modules by `module`
 
-For example, the `IUserRepository`.ts file in the repositories folder defines the interface for the `UserRepository`. This interface is then implemented in the `UserRestFullRepository.ts` file in the restFull folder. The `UserService.ts` file in the services folder uses the `IUserRepository` to interact with the data source.
+Module Name: Enter the name of the module you want to create.
+Generated Files:
 
-Similarly, the `UserController.ts` file in the controllers folder uses the `UserService` to handle the user interactions. The `UserReactQuery.ts` file in the `reactQuery` folder uses the `UserController` to fetch the data for the UI components.
+```
+src/modules/{moduleName}/domains/I{ModuleName}Service.ts
+src/modules/{moduleName}/domains/models/{ModuleName}.ts
+src/modules/{moduleName}/{ModuleName}.service.ts
+src/modules/{moduleName}/{ModuleName}.presentation.ts
+```
 
-This structure allows you to swap the inner workings of the infrastructure without having to change the domain layer, making your code easier to maintain and test
+### Generating App Router `app-router`
+
+#### Prompts:
+
+- Router Path: Specify the path for the app router.
+- Router File Name: Provide a name for the router file.
+- Module Name: Select the module to which you want to add the router.
+
+#### Generated Files:
+
+```
+src/app/[locale]/dashboard/{routerPath}/page.tsx
+src/app/[locale]/dashboard/{routerPath}/_viewModule/{partialName}.context.tsx
+src/app/[locale]/dashboard/{routerPath}/_viewModule/{partialName}.view.tsx
+src/app/[locale]/dashboard/{routerPath}/_viewModule/{partialName}.vm.ts
+```
+
+### Adding Endpoints `app-endpoint`
+
+#### Prompts:
+
+- Endpoint Name: Enter the name of the endpoint you want to add.
+
+#### Modification:
+
+The endpoint will be added to src/constants/endpoints.ts with the following structure:
+
+#### Generated Files:
+
+```
+{moduleName}: {
+  GET_{moduleName}: () => `${HOST_URL_API}/{moduleName}/`,
+  POST_{moduleName}: () => `${HOST_URL_API}/{moduleName}/`,
+  GET_{moduleName}_ID: (id: string) => `${HOST_URL_API}/{moduleName}/${id}/`,
+  PUT_{moduleName}_ID: (id: string) => `${HOST_URL_API}/{moduleName}/${id}/`,
+  DELETE_{moduleName}_ID: (id: string) => `${HOST_URL_API}/{moduleName}/${id}/`,
+},
+```
 
 ## Getting Started
 
@@ -361,6 +294,10 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, run the development server:
 
 ```bash
+# install dependencies
+npm i
+
+# run develop mode
 npm run dev
 # or
 yarn dev
@@ -374,14 +311,6 @@ Open [http://localhost:3000/login](http://localhost:3000/login) with your browse
 
 - username: {{EMAIL}}
 - password: {{PASSWORD}}
-
-## CLI
-
-You can use modules cli for generate DDD api folders and files in `/modules` folder
-
-```bash
-sh modules.sh
-```
 
 ## Learn More
 

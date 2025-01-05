@@ -2,7 +2,7 @@
 
 import React, { useContext } from 'react';
 import { Line } from '@ant-design/charts';
-import { ThemeContext } from '@/boilerplate/contexts/Theme';
+import { ThemeContext } from 'papak/configs/themeContextProvider';
 
 const LineChart: React.FC = () => {
   const themeContextConsumer = useContext(ThemeContext);

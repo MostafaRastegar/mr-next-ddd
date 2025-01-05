@@ -1,92 +1,110 @@
 'use client';
 
-import { type ReactNode, useEffect, useState } from 'react';
-import { redirect, usePathname } from 'next/navigation';
-import { ConfigProvider, theme } from 'antd';
-import { Layout } from 'antd';
-import { ThemeContextProvider } from '@/boilerplate/contexts/Theme';
-import Footer from '@/boilerplate/kits/Footer';
-import Header from '@/boilerplate/kits/Header';
-import SideBar from '@/boilerplate/kits/SideBar';
-
-const { defaultAlgorithm, darkAlgorithm } = theme;
-
-function _tailWindDarkModeHandle(isDarkLocalStorage: boolean) {
-  if (isDarkLocalStorage) {
-    window.document.body.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-  } else {
-    window.document.body.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
-  }
-  return isDarkLocalStorage;
-}
-
-function _multiLanguageRedirect(pathname: string, rtl: boolean) {
-  const redirectPath = pathname
-    .split('/')
-    .map((item, index) => {
-      if (index === 1) {
-        return rtl ? 'fa' : 'en';
-      }
-      return item;
-    })
-    .join('/');
-
-  return redirect(redirectPath);
-}
+import { type ReactNode, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  IconBell,
+  IconFolder,
+  IconLayoutDashboard,
+  IconUser,
+} from '@tabler/icons-react';
+import { Avatar, Dropdown, Layout, MenuProps, Space } from 'antd';
+import { customTheme } from 'papak/configs/antdCustomTheme';
+import Header from 'papak/kits/Header';
+import SideBar from 'papak/kits/SideBar';
+import { type MenuItemType, getItem } from 'papak/kits/SideBarMenu';
+import { useAccessTokenPayload } from 'papak/utils/useAccessTokenPayload';
+import { useThemeProvider } from 'papak/utils/useThemeProvider';
+import { blackListToken } from '@/modules/papak_auth/refreshToken';
 
 export default function Template({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isRtlMode, setIsRtlMode] = useState(false);
+  const {
+    isDarkMode,
+    isRtlMode,
+    ConfigProvider,
+    handleThemeDirection,
+    handleThemeMode,
+  } = useThemeProvider();
 
-  const handleThemeMode = () => {
-    setIsDarkMode(!isDarkMode);
-    _tailWindDarkModeHandle(!isDarkMode);
-  };
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const userDetails = useAccessTokenPayload<{
+    is_staff: boolean;
+    user_id: number;
+    username: string;
+  }>('access_token' as string);
 
-  const handleThemeDirection = () => {
-    setIsRtlMode((previousValue) => {
-      localStorage.setItem('rtl', `${!previousValue}`);
-      _multiLanguageRedirect(pathname, !previousValue);
-      return !previousValue;
-    });
-  };
+  const profileItems: MenuProps['items'] = [
+    {
+      label: (
+        <span
+          className="cursor-pointer text-error-main"
+          onClick={() => blackListToken(setLoading)}
+        >
+          logout
+        </span>
+      ),
+      key: '2',
+    },
+  ];
 
-  useEffect(() => {
-    const isDarkLocalStorage = localStorage.getItem('theme') === 'dark';
-    setIsDarkMode(isDarkLocalStorage);
-    _tailWindDarkModeHandle(isDarkLocalStorage);
-
-    const isRTLLanguageLocalStorage = localStorage.getItem('rtl') === 'true';
-    setIsRtlMode(isRTLLanguageLocalStorage);
-  }, []);
+  if (loading) {
+    return (
+      <div className="flex flex-1 items-center justify-center">Logout ...</div>
+    );
+  }
 
   return (
-    <ConfigProvider
-      direction={isRtlMode ? 'rtl' : 'ltr'}
-      theme={{
-        algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
-      }}
-    >
-      <ThemeContextProvider value={isDarkMode ? 'dark' : 'light'}>
-        <Layout className="flex min-h-screen flex-row">
-          <div className="flex min-h-screen">
-            <SideBar />
-          </div>
-          <div className="flex min-h-screen w-full flex-col">
-            <Header
-              handleThemeMode={handleThemeMode}
-              isDarkMode={isDarkMode}
-              handleThemeDirection={handleThemeDirection}
-              isRtlMode={isRtlMode}
+    <ConfigProvider customTheme={customTheme}>
+      <Header
+        handleThemeMode={handleThemeMode}
+        isDarkMode={isDarkMode}
+        handleThemeDirection={handleThemeDirection}
+        isRtlMode={isRtlMode}
+        logoText="IP Address Management"
+        profileMenu={
+          <Dropdown menu={{ items: profileItems }} trigger={['click']}>
+            <a onClick={(e) => e.preventDefault()}>
+              <Space>
+                <Avatar size="small" src={<IconUser />} />
+                <span className=" text-white">{userDetails?.username}</span>
+              </Space>
+            </a>
+          </Dropdown>
+        }
+        notification={
+          <Space className="cursor-pointer">
+            <Avatar
+              size="small"
+              src={<IconBell />}
+              onClick={() => router.push('/en/dashboard/notification')}
             />
-            <div className="p-4">{children}</div>
-            <Footer className="mt-auto" />
+          </Space>
+        }
+      />
+      <Layout className="flex flex-row">
+        <SideBar items={items} />
+        <div className="relative flex flex-1 flex-col">
+          <div className="border-b">
+            <div className="page-title py-6"></div>
           </div>
-        </Layout>
-      </ThemeContextProvider>
+          <div className="flex flex-1 flex-col px-4 pb-4">{children}</div>
+        </div>
+      </Layout>
     </ConfigProvider>
   );
 }
+
+const items: MenuItemType[] = [
+  getItem(
+    <Link href="/en/dashboard">Dashboard</Link>,
+    'dashboard',
+    <IconLayoutDashboard />,
+  ),
+  getItem(
+    <Link href="/en/dashboard/users">Users</Link>,
+    'users',
+    <IconFolder />,
+  ),
+];

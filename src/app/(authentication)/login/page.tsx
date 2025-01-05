@@ -1,13 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { LoginView } from './_viewModule/Login.view';
-import { useLoginVM } from './_viewModule/useLogin.vm';
-
-const LoginWrapper = () => {
-  const { isPending, onFinish } = useLoginVM();
-  return <LoginView onFinish={onFinish} isPending={isPending} />;
-};
+import { LoginView } from './_viewModule/login.view';
 
 export default function LoginPage() {
   return (
@@ -16,7 +10,7 @@ export default function LoginPage() {
         <p style={{ textAlign: 'center' }}>loading... on initial request</p>
       }
     >
-      <LoginWrapper />
+      <LoginView />
     </Suspense>
   );
 }

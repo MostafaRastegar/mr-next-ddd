@@ -1,3 +1,4 @@
+import { palettes } from './src/papak/configs/palettes';
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
@@ -6,18 +7,15 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/**/*.{tsx,css}',
+    './papak/**/*.{tsx,css}',
   ],
   darkMode: ['class'],
   theme: {
     container: {
       center: true,
     },
-    extend: {
-      colors: {
-        custom: {
-          100: 'red',
-        },
-      },
+    colors: {
+      ...palettes,
     },
   },
   important: true,

@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+* {
+  box-sizing: border-box;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  padding: 4px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+}
+
+.required-label::before {
+  display: inline-block;
+  margin-inline-end: 4px;
+  color: #f4364c;
+  font-size: 14px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
+  content: '*';
+}
+
+.ant-pagination-item,
+.ant-pagination-next,
+.ant-pagination-prev {
+  height: 24px !important;
+  line-height: 23px !important;
+}
+
+.ant-pagination-options .ant-select-single {
+  height: 24px !important;
+}
+
+.ant-pagination-item-active {
+  border-color: #cccad2 !important;
+}
+.ant-pagination-next,
+.ant-pagination-prev {
+  background-color: #e9e9ee !important;
+  width: 24px !important;
+  min-width: 24px !important;
+  padding: 0 !important;
+}
+
+.ant-pagination-next.ant-pagination-disabled,
+.ant-pagination-prev.ant-pagination-disabled {
+  opacity: 0.4;
+}
+
+.ant-slider-dot {
+  inset-block-start: 1px !important;
+}
+.ant-slider-handle::before {
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+}
+
+.ant-slider .ant-slider-dot,
+.ant-slider .ant-slider-dot-active {
+  border-color: #fafafa !important;
+}
+
+.ant-table-wrapper .ant-table-cell {
+  overflow-wrap: anywhere !important;
+}
+.ant-table-row {
+  &:nth-child(2n + 1) {
+    background-color: #fafafa;
+  }
+  > .ant-table-cell {
+    border-color: #e9e9ee !important;
+  }
+}
+
+.table-filter-none .ant-table-container .cursor-pointer {
+  cursor: default !important;
+  pointer-events: none !important;
+  svg {
+    display: none;
+  }
+}
+
+thead
+  + tbody
+  > tr.ant-table-row.ant-table-row-selected:nth-child(even)
+  > td.ant-table-cell-fix-left {
+  background: #f0fffe !important;
+}
+
+.ant-modal-root .ant-modal-mask {
+  background-color: rgb(27 27 31 / 92%) !important;
+}

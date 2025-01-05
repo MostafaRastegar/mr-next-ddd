@@ -5,7 +5,7 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import { Card, Skeleton, Statistic, Timeline } from 'antd';
-import Breadcrump from '@/boilerplate/kits/Breadcrump';
+import { PageFilterInlineSearch } from '@/components/PageFilterInlineSearch';
 import Lists from '../_components/Lists';
 import Tables from '../_components/Tables';
 
@@ -21,7 +21,7 @@ const GaugeChart = dynamic(() => import('../_components/GaugeChart'), {
 export const DashboardView = () => {
   return (
     <>
-      <Breadcrump />
+      <PageFilterInlineSearch title="dashboard" />
       <div
         style={{
           minHeight: 360,

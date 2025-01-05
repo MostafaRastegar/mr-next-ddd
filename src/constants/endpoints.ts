@@ -1,21 +1,15 @@
-// const HOST_URL = process.env.HOST_URL;
-const HOST_URL = 'https://api.realworld.io/api';
+const HOST_URL_API = process.env.NEXT_PUBLIC_HOST_URL;
 const endpoints = {
   USERS: {
-    GET_USERS_ID: (id: number) =>
-      `https://jsonplaceholder.typicode.com/users/${id}`,
-    GET_USER: () => `${HOST_URL}/user`,
-    PUT_USER: () => `${HOST_URL}/user`,
-    POST_USERS_LOGIN: () => `${HOST_URL}/users/login`,
-    POST_USERS: () => `${HOST_URL}/users`,
+    GET_USERS: () => `${HOST_URL_API}/users/`,
+    POST_USERS: () => `${HOST_URL_API}/users/`,
+    POST_USERS_LOGIN: () => `${HOST_URL_API}/users/login/`,
+    GET_USERS_ID: (id: string) => `${HOST_URL_API}/users/${id}/`,
+    PUT_USERS_ID: (id: string) => `${HOST_URL_API}/users/${id}/`,
+    DELETE_USERS_ID: (id: string) => `${HOST_URL_API}/users/${id}/`,
   },
-  ARTICLES: {
-    GET_ARTICLES: () => `${HOST_URL}/articles`,
-    GET_ARTICLES_SLUG: (slug: string) => `${HOST_URL}/articles/${slug}`,
-    POST_ARTICLES: () => `${HOST_URL}/articles`,
-    PUT_ARTICLES_SLUG: (slug: string) => `${HOST_URL}/articles/${slug}`,
-    DELETE_ARTICLES_SLUG: (slug: string) => `${HOST_URL}/articles/${slug}`,
-    GET_TAGS: () => `${HOST_URL}/tags`,
+  MOCK: {
+    POST_LOGIN: () => `${HOST_URL_API}/token/`,
   },
 };
 

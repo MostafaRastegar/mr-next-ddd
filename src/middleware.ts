@@ -1,6 +1,6 @@
-import { chain } from '@/boilerplate/middlewares/chain';
-import { withAuthentication } from '@/boilerplate/middlewares/withAuthentication';
-import { withIntl } from '@/boilerplate/middlewares/withIntl';
+import { chain } from 'papak/middlewares/chain';
+import { withAuthentication } from 'papak/middlewares/withAuthentication';
+import { withIntl } from 'papak/middlewares/withIntl';
 
 export default chain([withIntl, withAuthentication]);
 
