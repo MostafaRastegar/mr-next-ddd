@@ -10,21 +10,20 @@ const AppRouter = () => {
     <Suspense fallback={<div className="text-center">Loading...</div>}>
       <Routes>
         {/* Public Routes */}
-        {/* <Route path="/login" element={<LoginPage />} /> */}
+        <Route path="/login" element={<LoginPage />} />
 
         {/* Protected Routes */}
-        {/* <Route
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* Default redirect */}
-        {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* 404 */}
         <Route path="*" element={<NotFoundPage />} />

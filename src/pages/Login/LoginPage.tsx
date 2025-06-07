@@ -8,12 +8,12 @@ type FieldType = {
 
 const LoginPage = () => {
   const { useUserLoginMock } = UsersPresentation();
-  // const { mutate, isPending } = useUserLoginMock();
+  const { mutate, isPending } = useUserLoginMock();
 
-  // const onFinish = (formData: { email: string; password: string }) => {
-  //   const body = { user: formData };
-  //   return mutate(body);
-  // };
+  const onFinish = (formData: { email: string; password: string }) => {
+    const body = { user: formData };
+    return mutate(body);
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white">
@@ -33,7 +33,7 @@ const LoginPage = () => {
           <Form
             name="basic"
             initialValues={{ remember: true }}
-            // onFinish={onFinish}
+            onFinish={onFinish}
             autoComplete="off"
             layout="vertical"
             className="w-full"
@@ -69,7 +69,7 @@ const LoginPage = () => {
                 className="w-full"
                 type="primary"
                 htmlType="submit"
-                // loading={isPending}
+                loading={isPending}
               >
                 Login
               </Button>

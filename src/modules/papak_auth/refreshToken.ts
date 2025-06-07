@@ -1,6 +1,6 @@
 "use client";
 
-import { JwtPayload, decode } from "jsonwebtoken";
+import { jwtDecode as decode } from "jwt-decode";
 import { DispatchSetStateAction } from "papak/_utilsTypes";
 import { serviceHandler } from "papak/helpers/serviceHandler";
 import { requestWithoutAuth } from "papak/utils/request";
@@ -28,7 +28,7 @@ export const refreshToken = async () => {
       onSuccess(response) {
         const access_token = response?.data?.access;
         if (access_token !== undefined) {
-          const decodeAccessToken = decode(access_token) as JwtPayload;
+          const decodeAccessToken = decode(access_token);
           if (decodeAccessToken.exp) {
             const expireDate = new Date(decodeAccessToken.exp);
             cookies.set("access_token", access_token, {

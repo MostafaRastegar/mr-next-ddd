@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const cookies = new Cookies();
-  const token = cookies.get("authToken");
+  const token = cookies.get("access_token");
 
   if (!token) {
     return <Navigate to="/login" replace />;
