@@ -1,4 +1,5 @@
-const HOST_URL_API = process.env.NEXT_PUBLIC_HOST_URL;
+// const HOST_URL_API = import.meta.env.VITE_PUBLIC_HOST_URL;
+const HOST_URL_API = import.meta.env.VITE_PUBLIC_HOST_URL;
 const endpoints = {
   USERS: {
     GET_USERS: () => `${HOST_URL_API}/users/`,
